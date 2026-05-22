@@ -1,0 +1,22 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: piggy-coach-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: piggy_root
+      MYSQL_DATABASE: piggy_coach
+      MYSQL_USER: piggy
+      MYSQL_PASSWORD: piggy_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - piggy_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppiggy_root"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  piggy_mysql_data:

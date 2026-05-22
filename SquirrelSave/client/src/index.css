@@ -1,0 +1,260 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Fredoka+One&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Coral/Peach Playful Palette */
+  --radius: 1rem;
+
+  --background: oklch(0.98 0.01 60);
+  --foreground: oklch(0.2 0.03 260);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.03 260);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.03 260);
+
+  --primary: oklch(0.65 0.22 25);        /* Coral */
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.92 0.05 60);      /* Peach cream */
+  --secondary-foreground: oklch(0.3 0.05 30);
+
+  --muted: oklch(0.95 0.02 60);
+  --muted-foreground: oklch(0.55 0.04 260);
+
+  --accent: oklch(0.72 0.18 160);        /* Mint green */
+  --accent-foreground: oklch(0.15 0.05 160);
+
+  --destructive: oklch(0.6 0.22 15);
+  --destructive-foreground: oklch(1 0 0);
+
+  --border: oklch(0.9 0.03 60);
+  --input: oklch(0.93 0.02 60);
+  --ring: oklch(0.65 0.22 25);
+
+  /* Custom brand tokens */
+  --coral: oklch(0.65 0.22 25);
+  --coral-light: oklch(0.88 0.1 25);
+  --peach: oklch(0.92 0.08 60);
+  --mint: oklch(0.72 0.18 160);
+  --mint-light: oklch(0.92 0.07 160);
+  --gold: oklch(0.78 0.18 85);
+  --gold-light: oklch(0.94 0.08 85);
+  --navy: oklch(0.22 0.08 260);
+  --purple: oklch(0.62 0.2 295);
+  --purple-light: oklch(0.92 0.07 295);
+
+  /* Wallet colors */
+  --wallet-needs: oklch(0.65 0.22 25);
+  --wallet-wants: oklch(0.72 0.18 295);
+  --wallet-savings: oklch(0.72 0.18 160);
+  --wallet-emergency: oklch(0.78 0.18 85);
+  --wallet-goals: oklch(0.62 0.2 220);
+
+  --sidebar-background: oklch(0.22 0.08 260);
+  --sidebar-foreground: oklch(0.95 0.01 60);
+  --sidebar-primary: oklch(0.65 0.22 25);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.3 0.06 260);
+  --sidebar-accent-foreground: oklch(0.95 0.01 60);
+  --sidebar-border: oklch(0.3 0.05 260);
+  --sidebar-ring: oklch(0.65 0.22 25);
+}
+
+.dark {
+  --background: oklch(0.15 0.03 260);
+  --foreground: oklch(0.95 0.01 60);
+  --card: oklch(0.2 0.04 260);
+  --card-foreground: oklch(0.95 0.01 60);
+  --popover: oklch(0.2 0.04 260);
+  --popover-foreground: oklch(0.95 0.01 60);
+  --primary: oklch(0.7 0.22 25);
+  --primary-foreground: oklch(0.1 0.02 260);
+  --secondary: oklch(0.28 0.05 260);
+  --secondary-foreground: oklch(0.95 0.01 60);
+  --muted: oklch(0.25 0.04 260);
+  --muted-foreground: oklch(0.65 0.04 260);
+  --accent: oklch(0.72 0.18 160);
+  --accent-foreground: oklch(0.1 0.05 160);
+  --destructive: oklch(0.6 0.22 15);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.28 0.05 260);
+  --input: oklch(0.28 0.05 260);
+  --ring: oklch(0.7 0.22 25);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar-background: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: 'Nunito', sans-serif;
+  --font-display: 'Fredoka One', cursive;
+}
+
+* {
+  border-color: var(--border);
+  outline-color: var(--ring);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Nunito', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: 'Fredoka One', cursive;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Flex min-size fix */
+.flex {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Button active scale */
+button:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Bottom nav safe area */
+.bottom-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Gradient backgrounds */
+.bg-coral-gradient {
+  background: linear-gradient(135deg, oklch(0.65 0.22 25), oklch(0.72 0.2 15));
+}
+
+.bg-peach-gradient {
+  background: linear-gradient(135deg, oklch(0.92 0.08 60), oklch(0.96 0.05 45));
+}
+
+.bg-mint-gradient {
+  background: linear-gradient(135deg, oklch(0.72 0.18 160), oklch(0.78 0.15 175));
+}
+
+/* Card hover */
+.card-hover {
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px oklch(0.65 0.22 25 / 0.15);
+}
+
+/* Streak flame */
+@keyframes flame-flicker {
+  0%, 100% { transform: scaleY(1) rotate(-2deg); }
+  50% { transform: scaleY(1.08) rotate(2deg); }
+}
+.flame-animate {
+  animation: flame-flicker 1.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* XP bar shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.xp-bar-shimmer {
+  background: linear-gradient(90deg, var(--coral) 0%, oklch(0.78 0.18 85) 50%, var(--coral) 100%);
+  background-size: 200% auto;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Bounce animation for mascot */
+@keyframes squirry-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.squirry-bounce {
+  animation: squirry-bounce 2s ease-in-out infinite;
+}
+
+@keyframes squirry-wobble {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+.squirry-wobble {
+  animation: squirry-wobble 0.5s ease-in-out;
+}
+
+@keyframes squirry-celebrate {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-12px) scale(1.05); }
+  75% { transform: translateY(-6px) scale(1.02); }
+}
+.squirry-celebrate {
+  animation: squirry-celebrate 0.8s ease-in-out infinite;
+}
+
+/* Pulse for FAB */
+@keyframes fab-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(0.65 0.22 25 / 0.4); }
+  50% { box-shadow: 0 0 0 12px oklch(0.65 0.22 25 / 0); }
+}
+.fab-pulse {
+  animation: fab-pulse 2s ease-in-out infinite;
+}
+
+/* Coin drop */
+@keyframes coin-drop {
+  0% { transform: translateY(-20px) scale(0.8); opacity: 0; }
+  60% { transform: translateY(4px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.coin-drop {
+  animation: coin-drop 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
