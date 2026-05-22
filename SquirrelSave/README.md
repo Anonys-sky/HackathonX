@@ -99,16 +99,21 @@ Copy `.env.example` → `.env`. Never commit secrets.
 ```
 SquirrelSave/
 ├── client/src/
-│   ├── pages/          # Home, Onboarding, Dashboard, Activity, Wealth, Goals, Social
-│   ├── components/     # SquirryMascot, BudgetPlannerView, SquirryNudgeBubble, UI
-│   └── lib/i18n.ts     # EN / BM translations
+│   ├── pages/              # Route screens (thin orchestration)
+│   ├── components/
+│   │   ├── activity/       # Parser, modals, skeleton
+│   │   ├── dashboard/      # Donut cards, skeleton
+│   │   └── …               # SquirryMascot, BudgetPlannerView, UI
+│   ├── hooks/              # useTransactionCache, useTranslation
+│   └── lib/                # trpc, currency, i18n
 ├── server/
-│   ├── routers.ts      # tRPC API (profile, wallets, transactions, coach, goals, …)
-│   ├── db.ts           # Drizzle queries
-│   └── lib/            # AI prompts, budget planner, LLM fallback
-├── shared/             # Config, gamification, budget planner types
-├── drizzle/            # Schema + SQL migrations
-└── server/_core/       # Express + Vite dev server bootstrap
+│   ├── routers/            # tRPC by domain (auth, profile, transactions, coach, …)
+│   ├── routers.ts          # Re-exports appRouter
+│   ├── db.ts               # Drizzle queries
+│   └── lib/                # AI, spendingStats, walletContext
+├── shared/                 # Config, schemas, gamification, budget planner
+├── drizzle/                # Schema + SQL migrations
+└── server/_core/           # Express + Vite dev server bootstrap
 ```
 
 ---
@@ -126,7 +131,7 @@ npm run build      # Production client + server bundle
 
 1. Schema — `drizzle/schema.ts` → apply SQL / `npm run db:push`  
 2. DB helpers — `server/db.ts`  
-3. tRPC procedures — `server/routers.ts`  
+3. tRPC procedures — `server/routers/<domain>.ts` (merged in `server/routers/index.ts`)  
 4. UI — `client/src/pages/` + `trpc.*` hooks  
 
 Auth in hackathon mode: every request uses a shared guest user (`server/_core/guestUser.ts`). `protectedProcedure` does not require login.
