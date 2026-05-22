@@ -13,6 +13,11 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { invokeLLMSafe } from "./lib/aiService";
 import { buildCoachSystemPrompt, buildTransactionParserPrompt } from "./lib/prompts";
 import {
+  buildBudgetPlannerPrompt,
+  budgetPlannerFallback,
+  parseBudgetPlanResponse,
+} from "./lib/budgetPlanner";
+import {
   getUserProfile,
   upsertUserProfile,
   updateUserProfile,
@@ -635,6 +640,92 @@ export const appRouter = router({
       await clearChatHistory(ctx.user.id);
       return { success: true };
     }),
+
+    planBudget: protectedProcedure
+      .input(
+        z.object({
+          message: z.string().min(1),
+          selectedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+          categories: z.array(
+            z.object({
+              id: z.string(),
+              amount: z.number().min(0),
+            })
+          ),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await saveChatMessage({ userId: ctx.user.id, role: "user", content: input.message });
+
+        const profile = await getUserProfile(ctx.user.id);
+        const walletList = await getUserWallets(ctx.user.id);
+        const currency = profile?.currency ?? DEFAULTS.currency;
+
+        const walletContext = walletList
+          .map(
+            (w) =>
+              `${w.label}: ${currency}${w.currentBalance.toFixed(0)} left of ${currency}${w.allocatedAmount.toFixed(0)}`
+          )
+          .join(", ");
+
+        const systemPrompt = buildBudgetPlannerPrompt({
+          currency,
+          monthlyIncome: profile?.monthlyIncome ?? 0,
+          selectedDate: input.selectedDate,
+          walletContext,
+          currentPlan: { selectedDate: input.selectedDate, categories: input.categories },
+        });
+
+        const userPayload = `${input.message}\n\n[Planning date: ${input.selectedDate}]`;
+
+        try {
+          const { result: response, meta } = await invokeLLMSafe({
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPayload },
+            ],
+            response_format: { type: "json_object" },
+          });
+
+          const raw = response.choices[0]?.message?.content;
+          const content = typeof raw === "string" ? raw : "{}";
+          let plan = parseBudgetPlanResponse(content);
+
+          if (!plan || plan.categories.length === 0) {
+            plan = budgetPlannerFallback(input.message, {
+              currency,
+              monthlyIncome: profile?.monthlyIncome ?? 0,
+              currentPlan: { selectedDate: input.selectedDate, categories: input.categories },
+            });
+          }
+
+          await saveChatMessage({
+            userId: ctx.user.id,
+            role: "assistant",
+            content: plan.reply,
+          });
+
+          return {
+            reply: plan.reply,
+            categories: plan.categories,
+            dailyTotal: plan.dailyTotal,
+            usedFallback: meta.usedFallback,
+          };
+        } catch (err) {
+          const plan = budgetPlannerFallback(input.message, {
+            currency,
+            monthlyIncome: profile?.monthlyIncome ?? 0,
+            currentPlan: { selectedDate: input.selectedDate, categories: input.categories },
+          });
+          await saveChatMessage({ userId: ctx.user.id, role: "assistant", content: plan.reply });
+          return {
+            reply: plan.reply,
+            categories: plan.categories,
+            dailyTotal: plan.dailyTotal,
+            usedFallback: true,
+          };
+        }
+      }),
   }),
 });
 

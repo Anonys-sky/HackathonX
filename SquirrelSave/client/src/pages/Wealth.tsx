@@ -1,29 +1,18 @@
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquirryMascot } from "@/components/SquirryMascot";
-import { Streamdown } from "streamdown";
+import { BudgetPlannerView } from "@/components/BudgetPlannerView";
 import { toast } from "sonner";
 import {
-  Send, Trash2, Zap, Trophy, Flame, Star, Crown, TrendingUp,
-  BookOpen, ExternalLink, Loader2, MessageCircle, BarChart3
+  Zap, Flame, Crown, BookOpen, ExternalLink, Loader2, BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const QUICK_PROMPTS_KEYS = [
-  "wealth.prompt_1",
-  "wealth.prompt_2",
-  "wealth.prompt_3",
-  "wealth.prompt_4",
-  "wealth.prompt_5",
-  "wealth.prompt_6",
-];
 
 const PARTNER_CARDS = [
   {
@@ -83,7 +72,7 @@ function getLevelTitle(level: number) {
 
 export default function Wealth() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState("coach");
+  const [activeTab, setActiveTab] = useState("budget");
 
   return (
     <AppLayout>
@@ -92,8 +81,8 @@ export default function Wealth() {
       <div className="px-4">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full rounded-2xl mb-4 bg-muted p-1">
-            <TabsTrigger value="coach" className="flex-1 rounded-xl text-sm font-semibold">
-              {t("wealth.coach_tab")}
+            <TabsTrigger value="budget" className="flex-1 rounded-xl text-sm font-semibold">
+              {t("wealth.budget_tab")}
             </TabsTrigger>
             <TabsTrigger value="gamification" className="flex-1 rounded-xl text-sm font-semibold">
               {t("wealth.progress_tab")}
@@ -103,8 +92,8 @@ export default function Wealth() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="coach">
-            <CoachTab t={t} />
+          <TabsContent value="budget">
+            <BudgetPlannerView />
           </TabsContent>
 
           <TabsContent value="gamification">
@@ -117,191 +106,6 @@ export default function Wealth() {
         </Tabs>
       </div>
     </AppLayout>
-  );
-}
-
-function CoachTab({ t }: { t: (key: string) => string }) {
-  const [input, setInput] = useState("");
-  const [localMessages, setLocalMessages] = useState<{ role: "user" | "assistant"; content: string; id: string }[]>([]);
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const utils = trpc.useUtils();
-
-  const historyQuery = trpc.coach.history.useQuery();
-  const chatMutation = trpc.coach.chat.useMutation({
-    onSuccess: (data) => {
-      setLocalMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.reply || t("wealth.coach_error"), id: Date.now().toString() },
-      ]);
-      if (data.usedFallback) {
-        toast.info(t("wealth.coach_fallback_hint"));
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message || t("common.error"));
-      setLocalMessages((prev) => prev.slice(0, -1));
-    },
-  });
-  const clearMutation = trpc.coach.clearHistory.useMutation({
-    onSuccess: () => {
-      utils.coach.history.invalidate();
-      setLocalMessages([]);
-      toast.success(t("wealth.history_cleared"));
-    },
-  });
-
-  const dbMessages = historyQuery.data ?? [];
-  const allMessages = dbMessages.length > 0 ? dbMessages : localMessages;
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [allMessages, localMessages]);
-
-  function handleSend() {
-    if (!input.trim() || chatMutation.isPending) return;
-    const msg = input.trim();
-    setInput("");
-    setLocalMessages((prev) => [
-      ...prev,
-      { role: "user", content: msg, id: Date.now().toString() },
-    ]);
-    chatMutation.mutate({ message: msg });
-    setTimeout(() => utils.coach.history.invalidate(), 1500);
-  }
-
-  function handleQuickPrompt(prompt: string) {
-    setInput(prompt);
-  }
-
-  const displayMessages = allMessages.length > 0 ? allMessages : localMessages;
-  const quickPrompts = QUICK_PROMPTS_KEYS.map(key => t(key));
-
-  return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 220px)" }}>
-      <div className="flex-1 overflow-y-auto space-y-3 pb-3">
-        {displayMessages.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center text-center py-4"
-          >
-            <SquirryMascot mood="happy" size={80} />
-            <h3 className="text-base font-display mt-3 mb-1">{t("wealth.coach_greeting")}</h3>
-            <p className="text-sm text-muted-foreground max-w-xs">
-              {t("wealth.coach_desc")}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 justify-center">
-              {quickPrompts.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => handleQuickPrompt(p)}
-                  className="text-xs bg-white border border-border rounded-full px-3 py-1.5 text-foreground font-medium hover:border-primary hover:text-primary transition-all"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        <AnimatePresence>
-          {displayMessages.map((msg: { role: string; content: string; id?: string }, i: number) => (
-            <motion.div
-              key={(msg as any).id ?? i}
-              initial={{ opacity: 0, y: 8, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className={cn("flex gap-2", msg.role === "user" ? "justify-end" : "justify-start")}
-            >
-              {msg.role === "assistant" && (
-                <div className="w-8 h-8 rounded-full bg-[oklch(0.95_0.05_25)] flex items-center justify-center flex-shrink-0 mt-1">
-                  🐿️
-                </div>
-              )}
-              <div
-                className={cn(
-                  "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm",
-                  msg.role === "user"
-                    ? "bg-primary text-white rounded-tr-sm"
-                    : "bg-white border border-border text-foreground rounded-tl-sm shadow-sm"
-                )}
-              >
-                {msg.role === "assistant" ? (
-                  <Streamdown className="text-sm leading-relaxed prose prose-sm max-w-none">{msg.content}</Streamdown>
-                ) : (
-                  <p className="leading-relaxed">{msg.content}</p>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-
-        {chatMutation.isPending && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex gap-2 items-center"
-          >
-            <div className="w-8 h-8 rounded-full bg-[oklch(0.95_0.05_25)] flex items-center justify-center">🐿️</div>
-            <div className="bg-white border border-border rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-              <div className="flex gap-1">
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={i}
-                    animate={{ y: [0, -4, 0] }}
-                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                    className="w-1.5 h-1.5 rounded-full bg-muted-foreground"
-                  />
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        <div ref={bottomRef} />
-      </div>
-
-      {displayMessages.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-          {quickPrompts.slice(0, 3).map((p) => (
-            <button
-              key={p}
-              onClick={() => handleQuickPrompt(p)}
-              className="flex-shrink-0 text-xs bg-white border border-border rounded-full px-3 py-1.5 text-foreground font-medium hover:border-primary hover:text-primary transition-all"
-            >
-              {p}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div className="flex gap-2 pt-2 pb-2">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-          placeholder={t("wealth.coach_placeholder")}
-          className="rounded-2xl flex-1 bg-white"
-          disabled={chatMutation.isPending}
-        />
-        <Button
-          onClick={handleSend}
-          disabled={!input.trim() || chatMutation.isPending}
-          className="rounded-2xl w-11 h-11 p-0 bg-primary text-white flex-shrink-0"
-        >
-          {chatMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-        </Button>
-        {displayMessages.length > 0 && (
-          <Button
-            variant="outline"
-            onClick={() => clearMutation.mutate()}
-            className="rounded-2xl w-11 h-11 p-0 flex-shrink-0"
-          >
-            <Trash2 size={14} />
-          </Button>
-        )}
-      </div>
-    </div>
   );
 }
 
