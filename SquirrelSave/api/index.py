@@ -19,17 +19,7 @@ if _env_file.is_file():
 os.environ.setdefault("VERCEL", "1")
 os.environ.setdefault("DATA_BACKEND", "local")
 
-_vercel_store = os.path.join("/tmp", "squirry-store.json")
-os.environ.setdefault("LOCAL_DATA_PATH", _vercel_store)
-
-# Vercel serverless /tmp is ephemeral (cold starts, new instances). Seed from bundled
-# demo data so refresh still lands on an onboarded dashboard for judges.
-_seed = ROOT / "backend" / "data" / "store.json"
-if _seed.is_file() and not os.path.isfile(_vercel_store):
-    import shutil
-
-    os.makedirs(os.path.dirname(_vercel_store) or ".", exist_ok=True)
-    shutil.copy(_seed, _vercel_store)
+os.environ.setdefault("LOCAL_DATA_PATH", os.path.join("/tmp", "squirry-store.json"))
 
 from mangum import Mangum  # noqa: E402
 from app.main import app  # noqa: E402

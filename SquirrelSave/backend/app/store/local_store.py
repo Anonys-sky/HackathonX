@@ -70,18 +70,15 @@ class LocalStore:
 
     # ── Users ─────────────────────────────────────────────────────────────
 
-    def ensure_demo_user(self) -> dict:
-        settings = get_settings()
-        uid = settings.demo_user_id
-
+    def ensure_user(self, uid: str, *, name: str, email: str) -> dict:
         def work(data):
             if uid not in data["users"]:
                 num_id = self._next_id(data, "user")
                 data["users"][uid] = {
                     "id": num_id,
                     "openId": uid,
-                    "name": settings.demo_user_name,
-                    "email": settings.demo_user_email,
+                    "name": name,
+                    "email": email,
                     "loginMethod": "guest",
                     "role": "user",
                     "createdAt": _now_iso(),
@@ -93,6 +90,14 @@ class LocalStore:
             return data["users"][uid]
 
         return self._mutate(work)
+
+    def ensure_demo_user(self) -> dict:
+        settings = get_settings()
+        return self.ensure_user(
+            settings.demo_user_id,
+            name=settings.demo_user_name,
+            email=settings.demo_user_email,
+        )
 
     def get_user(self, uid: str) -> dict | None:
         data = self._load()

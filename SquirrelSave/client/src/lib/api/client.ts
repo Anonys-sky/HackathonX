@@ -1,3 +1,4 @@
+import { getVisitorId } from "@/lib/visitorId";
 import type {
   ApiAuthUser,
   ApiBudgetAlert,
@@ -64,6 +65,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         headers: {
           "Content-Type": "application/json",
           "X-Demo-Mode": "true",
+          "X-Visitor-Id": getVisitorId(),
           ...(options.headers as Record<string, string>),
         },
       });

@@ -251,7 +251,7 @@ Use Firestore in production for multi-user persistence beyond local JSON.
 | Campus league | **Demo data** for showcase |
 | Invest “Explore” | Toast placeholder, not live deep links |
 | Auth | Demo guest only; Firebase Auth optional for production |
-| **Vercel data** | **Ephemeral** — API uses `/tmp`; refresh or cold start may reset to bundled `backend/data/store.json` seed. Custom onboarding on Vercel may not persist. Use **localhost** for full demo or **Firestore** for production. |
+| **Vercel data** | **Per-browser** (`X-Visitor-Id` in localStorage) — visitors do **not** share one account. Storage is still **ephemeral** (`/tmp`); a cold start can wipe *your* session until you use Firestore or a hosted API with disk. |
 | Exam calendar | Hard-coded demo periods in `shared/contextRules.ts` |
 
 ---
