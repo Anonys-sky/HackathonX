@@ -16,6 +16,8 @@ import {
   formatBudgetMonth,
   monthDateRange,
   safeToSpendDaily,
+  savingsContributionsFromTransactions,
+  walletSavedTowardGoal,
   walletSpent,
 } from "@/lib/budgetCycle";
 import { MonthlyIncomeCard } from "@/components/dashboard/MonthlyIncomeCard";
@@ -106,12 +108,18 @@ export default function Dashboard() {
     }
   }, [todayStats.count, todayKey]);
 
+  const monthTransactions = monthIncomeTxQuery.data?.transactions ?? [];
+
   const incomeReceivedThisMonth = useMemo(() => {
-    const txs = monthIncomeTxQuery.data?.transactions ?? [];
-    return txs
+    return monthTransactions
       .filter((tx: { type: string }) => tx.type === "income")
       .reduce((s: number, tx: { amount: number }) => s + tx.amount, 0);
-  }, [monthIncomeTxQuery.data]);
+  }, [monthTransactions]);
+
+  const savingsSavedFromTx = useMemo(
+    () => savingsContributionsFromTransactions(monthTransactions),
+    [monthTransactions]
+  );
 
   const monthLabel = formatBudgetMonth(new Date(), language === "bm" ? "ms-MY" : "en-MY");
 
@@ -152,8 +160,12 @@ export default function Dashboard() {
   const savingWallets = wallets.filter((w) => SAVING_WALLET_TYPES.has(w.walletType));
 
   const savingsGoal = sumWallets(wallets, SAVING_WALLET_TYPES, (w) => w.allocatedAmount);
-  const savingsSaved = sumWallets(wallets, SAVING_WALLET_TYPES, (w) =>
-    walletSpent(w.allocatedAmount, w.currentBalance)
+  const savingsSavedFromWallets = sumWallets(wallets, SAVING_WALLET_TYPES, (w) =>
+    walletSavedTowardGoal(w.allocatedAmount, w.currentBalance)
+  );
+  const savingsSaved = Math.min(
+    savingsGoal,
+    Math.max(savingsSavedFromWallets, savingsSavedFromTx)
   );
 
   const spendingLimit = sumWallets(wallets, SPENDING_WALLET_TYPES, (w) => w.allocatedAmount);

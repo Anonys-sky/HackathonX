@@ -1,255 +1,238 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { useTranslation } from "@/hooks/useTranslation";
-import { AppLayout, PageHeader } from "@/components/AppLayout";
+import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SquirryMascot } from "@/components/SquirryMascot";
 import { toast } from "sonner";
-import { Plus, Target, Star, Trophy, Loader2 } from "lucide-react";
+import { Trophy, UserPlus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { GAMIFICATION, SOCIAL } from "@shared/config";
+import { SOCIAL } from "@shared/config";
+import { BadgesSheet } from "@/components/social/BadgesSheet";
+import { LeagueLeaderboard, type LeagueRow } from "@/components/social/LeagueLeaderboard";
+import { CAMPUS_LEAGUE } from "@/components/social/campusLeague";
 
 const AVATARS = SOCIAL.friendAvatars;
-const STREAK_BADGES = GAMIFICATION.streakBadges;
 
-function getStreakBadge(streak: number) {
-  return [...STREAK_BADGES].reverse().find((b) => streak >= b.days);
+type LeagueTab = "friends" | "campus";
+
+function budgetEfficiency(spendingPercent: number): number {
+  return Math.max(0, Math.min(100, 100 - Math.round(spendingPercent)));
 }
 
 export default function Social() {
   const { t } = useTranslation();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [tab, setTab] = useState<LeagueTab>("friends");
+  const [showBadges, setShowBadges] = useState(false);
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [pokingId, setPokingId] = useState<number | null>(null);
 
   const streaksQuery = trpc.streaks.list.useQuery();
   const profileQuery = trpc.profile.getStats.useQuery();
   const utils = trpc.useUtils();
 
   const incrementMutation = trpc.streaks.incrementStreak.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data, vars) => {
       utils.streaks.list.invalidate();
       utils.profile.getStats.invalidate();
-      toast.success(`${t("social.streak_extended")} +${data.xpAwarded} XP 🔥`);
+      const friend = (streaksQuery.data ?? []).find((s) => s.id === vars.streakId);
+      toast.success(
+        t("social.poke_sent").replace("{{name}}", friend?.friendName ?? t("social.friend"))
+      );
+      setPokingId(null);
+    },
+    onError: () => {
+      setPokingId(null);
+      toast.error(t("common.error"));
     },
   });
 
+  const myStreak = profileQuery.data?.profile?.currentStreak ?? 0;
+  const myLevel = profileQuery.data?.profile?.level ?? 1;
+  const spendingPercent = profileQuery.data?.spendingPercent ?? 0;
+  const efficiency = budgetEfficiency(spendingPercent);
+
+  const friendEntries: LeagueRow[] = useMemo(() => {
+    const me: LeagueRow = {
+      id: "me",
+      friendName: t("social.you"),
+      friendAvatar: "🐿️",
+      currentStreak: myStreak,
+      isActive: myStreak > 0,
+      isMe: true,
+    };
+    const friends = (streaksQuery.data ?? []).map((s) => ({
+      id: `friend-${s.id}`,
+      streakId: s.id,
+      friendName: s.friendName,
+      friendAvatar: s.friendAvatar ?? SOCIAL.defaultFriendAvatar,
+      currentStreak: s.currentStreak,
+      isActive: s.isActive ?? false,
+      isMe: false,
+    }));
+    return [me, ...friends].sort((a, b) => b.currentStreak - a.currentStreak);
+  }, [streaksQuery.data, myStreak, t]);
+
+  const campusEntries: LeagueRow[] = useMemo(() => {
+    const me: LeagueRow = {
+      id: "me",
+      friendName: t("social.you"),
+      friendAvatar: "🐿️",
+      currentStreak: myStreak,
+      isActive: myStreak > 0,
+      isMe: true,
+    };
+    const campus = CAMPUS_LEAGUE.map((c) => ({
+      id: c.id,
+      friendName: c.friendName,
+      friendAvatar: c.friendAvatar,
+      currentStreak: c.currentStreak,
+      isActive: c.isActive,
+      isMe: false,
+    }));
+    return [me, ...campus].sort((a, b) => b.currentStreak - a.currentStreak);
+  }, [myStreak, t]);
+
+  const entries = tab === "friends" ? friendEntries : campusEntries;
+  const myRank = Math.max(1, entries.findIndex((e) => e.isMe) + 1);
+
+  function handlePoke(entry: LeagueRow) {
+    if (entry.streakId == null) return;
+    setPokingId(entry.streakId);
+    incrementMutation.mutate({ streakId: entry.streakId });
+  }
+
   if (profileQuery.isLoading) return <SocialSkeleton />;
-
-  const userStreaks = streaksQuery.data ?? [];
-  const profile = profileQuery.data?.profile;
-  const myStreak = profile?.currentStreak ?? 0;
-  const myLevel = profile?.level ?? 1;
-  const myXp = profile?.xpPoints ?? 0;
-
-  const allStreaks = [
-    { id: "me", friendName: `${t("social.you")} 🐿️`, friendAvatar: "🐿️", currentStreak: myStreak, isActive: true, isMe: true },
-    ...userStreaks.map((s, idx) => ({ ...s, id: `user-${s.id}-${idx}`, isMe: false })),
-  ].sort((a, b) => b.currentStreak - a.currentStreak);
-
-  const weeklyGoal = GAMIFICATION.weeklyChallengeDays;
-  const weeklyProgress = Math.min(myStreak, weeklyGoal);
 
   return (
     <AppLayout>
-      <PageHeader
-        title={t("social.title")}
-        subtitle={t("social.subtitle")}
-        right={
-          <Button size="sm" onClick={() => setShowAddModal(true)} className="rounded-xl bg-primary text-white h-8 px-3">
-            <Plus size={14} className="mr-1" /> {t("common.add")}
-          </Button>
-        }
-      />
-
-      <div className="px-4 space-y-4 pb-6">
-        {/* My streak card */}
-        <div className="bg-[oklch(0.22_0.08_260)] rounded-2xl p-4 text-white">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <SquirryMascot mood={myStreak >= 7 ? "celebrating" : myStreak > 0 ? "happy" : "sleeping"} size={70} level={myLevel} />
-            </div>
-            <div className="flex-1">
-              <p className="text-white/70 text-xs font-medium mb-1">{t("social.your_streak")}</p>
-              <div className="flex items-center gap-2">
-                <span className="flame-animate text-2xl">🔥</span>
-                <span className="text-3xl font-display text-white">{myStreak}</span>
-                <span className="text-white/60 text-sm">{t("social.days")}</span>
-              </div>
-              {getStreakBadge(myStreak) && (
-                <div className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold mt-1", getStreakBadge(myStreak)!.color)}>
-                  {getStreakBadge(myStreak)!.emoji} {t(getStreakBadge(myStreak)!.labelKey)}
-                </div>
-              )}
-            </div>
-            <div className="text-right">
-              <p className="text-white/70 text-xs">{t("social.level")}</p>
-              <p className="text-2xl font-display text-[oklch(0.78_0.18_85)]">{myLevel}</p>
-              <p className="text-white/60 text-xs">{myXp} XP</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Weekly Challenge */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <Target size={16} className="text-primary" />
-            <p className="text-sm font-bold text-foreground">{t("social.weekly_challenge")}</p>
-            <span className="ml-auto text-xs text-muted-foreground">{weeklyProgress}/{weeklyGoal} {t("social.days")}</span>
-          </div>
-          <div className="flex gap-1.5 mb-2">
-            {Array.from({ length: weeklyGoal }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ scale: 0.5 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: i * 0.05 }}
-                className={cn(
-                  "flex-1 h-8 rounded-xl flex items-center justify-center text-sm transition-all",
-                  i < weeklyProgress
-                    ? "bg-primary text-white shadow-sm"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {i < weeklyProgress ? "🔥" : (i + 1)}
-              </motion.div>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {weeklyProgress >= weeklyGoal
-              ? t("social.challenge_complete")
-              : `${weeklyGoal - weeklyProgress} ${t("social.more_days")}`}
-          </p>
-        </div>
-
-        {/* Streak Badges */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-border">
-          <div className="flex items-center gap-2 mb-3">
-            <Star size={16} className="text-[oklch(0.78_0.18_85)]" />
-            <p className="text-sm font-bold text-foreground">{t("social.streak_badges")}</p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {STREAK_BADGES.map((badge) => {
-              const earned = myStreak >= badge.days;
-              return (
-                <div
-                  key={badge.days}
-                  className={cn(
-                    "flex flex-col items-center gap-1 p-2 rounded-2xl border-2 transition-all",
-                    earned ? `${badge.color} border-current` : "bg-muted text-muted-foreground border-transparent opacity-50"
-                  )}
-                >
-                  <span className="text-xl">{badge.emoji}</span>
-                  <span className="text-[10px] font-bold text-center leading-tight">{t(badge.labelKey)}</span>
-                  <span className="text-[10px] opacity-70">{badge.days}d</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Leaderboard */}
-        <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-            <Trophy size={16} className="text-[oklch(0.78_0.18_85)]" />
-            <p className="text-sm font-bold text-foreground">{t("social.leaderboard")}</p>
-          </div>
-          <div className="divide-y divide-border">
-            {allStreaks.map((entry, rank) => {
-              const badge = getStreakBadge(entry.currentStreak);
-              const isTop3 = rank < 3;
-              const rankEmoji = rank === 0 ? "🥇" : rank === 1 ? "🥈" : rank === 2 ? "🥉" : null;
-
-              return (
-                <motion.div
-                  key={`${entry.id}-${rank}`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: rank * 0.04 }}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3",
-                    (entry as any).isMe && "bg-[oklch(0.97_0.03_25)]"
-                  )}
-                >
-                  <div className="w-7 text-center">
-                    {rankEmoji ? (
-                      <span className="text-lg">{rankEmoji}</span>
-                    ) : (
-                      <span className="text-sm font-bold text-muted-foreground">{rank + 1}</span>
-                    )}
-                  </div>
-
-                  <div className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center text-xl",
-                    isTop3 ? "bg-[oklch(0.96_0.05_85)] shadow-sm" : "bg-muted"
-                  )}>
-                    {entry.friendAvatar}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className={cn("text-sm font-semibold truncate", (entry as any).isMe ? "text-primary" : "text-foreground")}>
-                        {entry.friendName}
-                      </p>
-                      {(entry as any).isMe && <span className="text-xs text-primary font-bold">({t("social.you")})</span>}
-                    </div>
-                    {badge && (
-                      <span className={cn("text-[10px] font-semibold px-1.5 py-0.5 rounded-full", badge.color)}>
-                        {badge.emoji} {t(badge.labelKey)}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-1">
-                    <span className={cn("text-sm", entry.isActive ? "flame-animate" : "")}>🔥</span>
-                    <span className="text-sm font-bold text-foreground">{entry.currentStreak}</span>
-                  </div>
-
-                  {!(entry as any).isMe && typeof entry.id === 'string' && entry.id.startsWith('user-') && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-xl h-7 px-2 text-xs"
-                      onClick={() => {
-                        const streakId = parseInt(entry.id.split('-')[1]);
-                        incrementMutation.mutate({ streakId });
-                      }}
-                      disabled={incrementMutation.isPending}
-                    >
-                      {incrementMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : `🔥 ${t("social.nudge")}`}
-                    </Button>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Add friend prompt */}
-        <motion.div
-          whileTap={{ scale: 0.98 }}
-          onClick={() => setShowAddModal(true)}
-          className="bg-[oklch(0.95_0.05_160)] rounded-2xl p-4 flex items-center gap-3 cursor-pointer border-2 border-dashed border-[oklch(0.72_0.18_160)]"
-        >
-          <div className="w-10 h-10 rounded-full bg-[oklch(0.72_0.18_160)] flex items-center justify-center">
-            <Plus size={20} className="text-white" />
-          </div>
+      <div className="max-w-[430px] mx-auto w-full min-h-full pb-24 bg-[oklch(0.98_0.015_25)]">
+        <header className="flex items-center justify-between px-4 pt-4 pb-2">
           <div>
-            <p className="text-sm font-bold text-[oklch(0.35_0.15_160)]">{t("social.add_friend")}</p>
-            <p className="text-xs text-[oklch(0.45_0.12_160)]">{t("social.add_friend_desc")}</p>
+            <h1 className="text-2xl font-display text-foreground">{t("social.league_title")}</h1>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{t("social.rank_by_streak")}</p>
           </div>
-        </motion.div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowBadges(true)}
+              className="w-10 h-10 rounded-full bg-white border border-border/80 shadow-sm flex items-center justify-center"
+              aria-label={t("social.view_badges")}
+            >
+              <Trophy size={18} className="text-[oklch(0.72_0.16_85)]" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAddFriend(true)}
+              className="w-10 h-10 rounded-full bg-primary text-white shadow-md flex items-center justify-center"
+              aria-label={t("social.add_friend")}
+            >
+              <UserPlus size={18} />
+            </button>
+          </div>
+        </header>
+
+        <div className="px-4 mt-2">
+          <div className="flex rounded-2xl bg-muted p-1 mb-4">
+            <button
+              type="button"
+              onClick={() => setTab("friends")}
+              className={cn(
+                "flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors",
+                tab === "friends" ? "bg-white text-primary shadow-sm" : "text-muted-foreground"
+              )}
+            >
+              {t("social.friends_tab")}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("campus")}
+              className={cn(
+                "flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors",
+                tab === "campus" ? "bg-white text-primary shadow-sm" : "text-muted-foreground"
+              )}
+            >
+              {t("social.campus_tab")}
+            </button>
+          </div>
+
+          {/* You highlight */}
+          <div className="rounded-2xl border-2 border-primary/25 bg-white shadow-md p-4 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="shrink-0 rounded-2xl bg-[oklch(0.97_0.03_25)] p-1.5">
+                <SquirryMascot
+                  mood={myStreak >= 7 ? "celebrating" : myStreak > 0 ? "happy" : "sleeping"}
+                  size={52}
+                  level={myLevel}
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  {t("social.your_rank").replace("{{rank}}", String(myRank))}
+                </p>
+                <p className="text-lg font-display text-foreground mt-0.5">
+                  {t("social.streak_metric").replace("{{n}}", String(myStreak))}
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="text-2xl font-bold text-primary tabular-nums">{efficiency}%</p>
+                <p className="text-[10px] text-muted-foreground leading-tight max-w-[72px]">
+                  {t("social.efficiency_label")}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {tab === "campus" && (
+            <p className="text-[10px] text-center text-muted-foreground mb-3">
+              {t("social.campus_demo")}
+            </p>
+          )}
+
+          {entries.length <= 1 && tab === "friends" ? (
+            <div className="bg-white rounded-2xl border border-dashed border-border p-8 text-center">
+              <p className="text-sm text-muted-foreground mb-3">{t("social.add_friend_desc")}</p>
+              <Button size="sm" className="rounded-xl" onClick={() => setShowAddFriend(true)}>
+                <UserPlus size={16} className="mr-1" />
+                {t("social.add_friend")}
+              </Button>
+            </div>
+          ) : (
+            <LeagueLeaderboard
+              entries={entries}
+              t={t}
+              onPoke={tab === "friends" ? handlePoke : undefined}
+              pokingId={pokingId}
+            />
+          )}
+        </div>
       </div>
 
-      <AddFriendModal open={showAddModal} onClose={() => setShowAddModal(false)} t={t} />
+      <BadgesSheet open={showBadges} onClose={() => setShowBadges(false)} myStreak={myStreak} t={t} />
+
+      <AddFriendModal open={showAddFriend} onClose={() => setShowAddFriend(false)} t={t} />
     </AppLayout>
   );
 }
 
-function AddFriendModal({ open, onClose, t }: { open: boolean; onClose: () => void; t: (key: string) => string }) {
+function AddFriendModal({
+  open,
+  onClose,
+  t,
+}: {
+  open: boolean;
+  onClose: () => void;
+  t: (key: string) => string;
+}) {
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("🐿️");
   const utils = trpc.useUtils();
@@ -257,7 +240,7 @@ function AddFriendModal({ open, onClose, t }: { open: boolean; onClose: () => vo
   const addMutation = trpc.streaks.addFriend.useMutation({
     onSuccess: () => {
       utils.streaks.list.invalidate();
-      toast.success(`${t("common.success")} 🔥`);
+      toast.success(t("common.success"));
       onClose();
       setName("");
     },
@@ -285,6 +268,7 @@ function AddFriendModal({ open, onClose, t }: { open: boolean; onClose: () => vo
               {AVATARS.map((a) => (
                 <button
                   key={a}
+                  type="button"
                   onClick={() => setAvatar(a)}
                   className={cn(
                     "w-10 h-10 rounded-xl text-xl flex items-center justify-center border-2 transition-all",
@@ -299,10 +283,10 @@ function AddFriendModal({ open, onClose, t }: { open: boolean; onClose: () => vo
           <Button
             onClick={() => addMutation.mutate({ friendName: name, friendAvatar: avatar })}
             disabled={!name || addMutation.isPending}
-            className="w-full rounded-2xl h-12 font-semibold bg-coral-gradient text-white"
+            className="w-full rounded-2xl h-12 font-semibold"
           >
             {addMutation.isPending ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
-            {t("social.add_friend_btn")} 🔥
+            {t("social.add_friend_btn")}
           </Button>
         </div>
       </DialogContent>
@@ -313,10 +297,11 @@ function AddFriendModal({ open, onClose, t }: { open: boolean; onClose: () => vo
 function SocialSkeleton() {
   return (
     <AppLayout>
-      <div className="px-4 pt-10 space-y-4 pb-6">
+      <div className="max-w-[430px] mx-auto px-4 pt-4 space-y-4 pb-24">
+        <Skeleton className="h-10 w-40" />
+        <Skeleton className="h-11 w-full rounded-2xl" />
         <Skeleton className="h-24 w-full rounded-2xl" />
-        <Skeleton className="h-32 w-full rounded-2xl" />
-        <Skeleton className="h-40 w-full rounded-2xl" />
+        <Skeleton className="h-64 w-full rounded-2xl" />
       </div>
     </AppLayout>
   );

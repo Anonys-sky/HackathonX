@@ -23,6 +23,38 @@ export function safeToSpendDaily(remainingBudget: number, date = new Date()): nu
   return remainingBudget / daysLeftInMonth(date);
 }
 
+/** Spending buckets: balance goes down as you spend. */
 export function walletSpent(allocated: number, balance: number): number {
   return Math.max(0, allocated - balance);
+}
+
+const SAVING_WALLET_TYPES = new Set(["savings", "emergency", "goals"]);
+
+export function isSavingWalletType(walletType: string): boolean {
+  return SAVING_WALLET_TYPES.has(walletType);
+}
+
+/**
+ * Savings buckets fill toward a goal (0 → allocated).
+ * Legacy wallets started with balance === allocated; deposits push balance above allocated.
+ */
+export function walletSavedTowardGoal(allocated: number, balance: number): number {
+  if (allocated <= 0) return 0;
+  const bal = Math.max(0, balance);
+  if (bal > allocated) {
+    return Math.min(allocated, bal - allocated);
+  }
+  if (bal === allocated) {
+    return 0;
+  }
+  return Math.min(allocated, bal);
+}
+
+/** Income logged as savings this month (matches Activity "+RM50 Saving"). */
+export function savingsContributionsFromTransactions(
+  transactions: Array<{ type: string; category: string; amount: number }>
+): number {
+  return transactions
+    .filter((tx) => tx.type === "income" && tx.category === "savings")
+    .reduce((sum, tx) => sum + tx.amount, 0);
 }

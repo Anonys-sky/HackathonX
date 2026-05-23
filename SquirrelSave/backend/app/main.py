@@ -238,6 +238,7 @@ def wallets_setup(body: WalletSetup, user: dict = Depends(get_current_user)):
     store = get_store()
     store.delete_wallets(uid)
     items = []
+    saving_types = {"savings", "emergency", "goals"}
     for a in body.allocations:
         amt = (a.allocationPercent / 100) * body.monthlyIncome
         items.append(
@@ -246,7 +247,7 @@ def wallets_setup(body: WalletSetup, user: dict = Depends(get_current_user)):
                 "label": a.label,
                 "allocationPercent": a.allocationPercent,
                 "allocatedAmount": amt,
-                "currentBalance": amt,
+                "currentBalance": 0 if a.walletType in saving_types else amt,
                 "color": a.color,
             }
         )

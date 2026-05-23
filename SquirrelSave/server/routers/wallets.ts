@@ -27,15 +27,19 @@ export const walletsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       await deleteUserWallets(ctx.user.id);
-      const walletsToCreate = input.allocations.map((a) => ({
-        userId: ctx.user.id,
-        walletType: a.walletType,
-        label: a.label,
-        allocationPercent: a.allocationPercent,
-        allocatedAmount: (a.allocationPercent / 100) * input.monthlyIncome,
-        currentBalance: (a.allocationPercent / 100) * input.monthlyIncome,
-        color: a.color,
-      }));
+      const savingTypes = new Set(["savings", "emergency", "goals"]);
+      const walletsToCreate = input.allocations.map((a) => {
+        const amt = (a.allocationPercent / 100) * input.monthlyIncome;
+        return {
+          userId: ctx.user.id,
+          walletType: a.walletType,
+          label: a.label,
+          allocationPercent: a.allocationPercent,
+          allocatedAmount: amt,
+          currentBalance: savingTypes.has(a.walletType) ? 0 : amt,
+          color: a.color,
+        };
+      });
       await createWallets(walletsToCreate);
       return { success: true };
     }),
