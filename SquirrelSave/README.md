@@ -229,9 +229,27 @@ MBB PETRON 45.00
 
 ### Vercel (`SquirrelSave/vercel.json`)
 
+**Vercel project settings (important):**
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `SquirrelSave` **or** leave empty and use repo-root `HackathonX/vercel.json` — pick **one**, not both mixed |
+| **Framework Preset** | Vite (or Other) |
+| **Build Command** | Leave empty (uses `vercel.json`) |
+| **Install Command** | Leave empty (uses `vercel.json`) |
+
 - Builds PWA → `dist/public`
-- `/api/*` → Python function
+- `/api/*` → Python serverless (`api/index.py` + `api/requirements.txt`)
 - SPA fallback → `index.html`
+- Uses **npm** (`package-lock.json`), not pnpm — delete any `pnpm-lock.yaml` if Vercel still tries pnpm
+
+**If build fails:** open the failed deployment → **Building** log. Common errors:
+
+1. `ERR_PNPM_OUTDATED_LOCKFILE` — push latest `main` (pnpm lock removed) or set Install Command to `npm install --legacy-peer-deps`
+2. `pip: command not found` — fixed: Vercel installs Python deps from `api/requirements.txt` automatically (no manual `pip` in install)
+3. Function size exceeded — `api/requirements.txt` is slimmed (no `firebase-admin` on Vercel; demo uses `DATA_BACKEND=local`)
+
+**Env vars on Vercel** (Project → Settings → Environment Variables): optional `LLM_*`, `LLM_LOCAL_ONLY=true` for demos. Do **not** commit `.env`.
 
 ### Full stack (Railway / Render / Fly.io)
 
