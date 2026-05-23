@@ -229,27 +229,7 @@ MBB PETRON 45.00
 
 ### Vercel (`SquirrelSave/vercel.json`)
 
-**Vercel project settings (important):**
 
-| Setting | Value |
-|---------|--------|
-| **Root Directory** | `SquirrelSave` **or** leave empty and use repo-root `HackathonX/vercel.json` — pick **one**, not both mixed |
-| **Framework Preset** | Vite (or Other) |
-| **Build Command** | Leave empty (uses `vercel.json`) |
-| **Install Command** | Leave empty (uses `vercel.json`) |
-
-- Builds PWA → `dist/public`
-- `/api/*` → Python serverless (`api/index.py` + `api/requirements.txt`)
-- SPA fallback → `index.html`
-- Uses **npm** (`package-lock.json`), not pnpm — delete any `pnpm-lock.yaml` if Vercel still tries pnpm
-
-**If build fails:** open the failed deployment → **Building** log. Common errors:
-
-1. `ERR_PNPM_OUTDATED_LOCKFILE` — push latest `main` (pnpm lock removed) or set Install Command to `npm install --legacy-peer-deps`
-2. `pip: command not found` — fixed: Vercel installs Python deps from `api/requirements.txt` automatically (no manual `pip` in install)
-3. Function size exceeded — `api/requirements.txt` is slimmed (no `firebase-admin` on Vercel; demo uses `DATA_BACKEND=local`)
-
-**Env vars on Vercel** (Project → Settings → Environment Variables): optional `LLM_*`, `LLM_LOCAL_ONLY=true` for demos. Do **not** commit `.env`.
 
 ### Full stack (Railway / Render / Fly.io)
 
@@ -271,6 +251,7 @@ Use Firestore in production for multi-user persistence beyond local JSON.
 | Campus league | **Demo data** for showcase |
 | Invest “Explore” | Toast placeholder, not live deep links |
 | Auth | Demo guest only; Firebase Auth optional for production |
+| **Vercel data** | **Ephemeral** — API uses `/tmp`; refresh or cold start may reset to bundled `backend/data/store.json` seed. Custom onboarding on Vercel may not persist. Use **localhost** for full demo or **Firestore** for production. |
 | Exam calendar | Hard-coded demo periods in `shared/contextRules.ts` |
 
 ---
