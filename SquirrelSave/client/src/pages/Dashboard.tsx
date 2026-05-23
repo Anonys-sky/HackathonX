@@ -123,19 +123,19 @@ export default function Dashboard() {
 
   const monthLabel = formatBudgetMonth(new Date(), language === "bm" ? "ms-MY" : "en-MY");
 
-  if (statsQuery.isLoading) return <DashboardSkeleton />;
-
   const stats = statsQuery.data;
   const profile = stats?.profile;
+  const needsOnboarding =
+    !statsQuery.isLoading &&
+    statsQuery.isSuccess &&
+    (!profile || !profile.onboardingComplete);
 
-  if (!statsQuery.isLoading && profile && !profile.onboardingComplete) {
-    navigate("/onboard");
-    return null;
-  }
-  if (!statsQuery.isLoading && !profile) {
-    navigate("/onboard");
-    return null;
-  }
+  useEffect(() => {
+    if (needsOnboarding) navigate("/onboard");
+  }, [needsOnboarding, navigate]);
+
+  if (statsQuery.isLoading) return <DashboardSkeleton />;
+  if (needsOnboarding) return null;
 
   const wallets = (stats?.wallets ?? []) as WalletRow[];
   const alerts = alertsQuery.data ?? [];

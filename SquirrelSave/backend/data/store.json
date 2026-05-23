@@ -5,8 +5,8 @@
     "transaction": 7,
     "goal": 0,
     "streak": 1,
-    "xp": 10,
-    "chat": 16
+    "xp": 13,
+    "chat": 20
   },
   "users": {
     "guest-demo-judge": {
@@ -18,7 +18,7 @@
       "role": "user",
       "createdAt": "2026-05-23T09:51:55.637227+00:00",
       "updatedAt": "2026-05-23T09:51:55.637227+00:00",
-      "lastSignedIn": "2026-05-23T13:17:40.684478+00:00"
+      "lastSignedIn": "2026-05-23T13:57:29.944449+00:00"
     }
   },
   "profiles": {
@@ -27,9 +27,9 @@
       "currency": "RM",
       "onboardingComplete": true,
       "userId": "guest-demo-judge",
-      "updatedAt": "2026-05-23T12:55:20.953390+00:00",
+      "updatedAt": "2026-05-23T13:35:49.389301+00:00",
       "createdAt": "2026-05-23T10:58:46.758024+00:00",
-      "xpPoints": 295,
+      "xpPoints": 355,
       "level": 1,
       "currentStreak": 1,
       "longestStreak": 1,
@@ -276,6 +276,30 @@
       "xpAwarded": 25,
       "description": "Extended streak with ddd to 1 days!",
       "createdAt": "2026-05-23T12:47:59.115537+00:00"
+    },
+    "11": {
+      "id": 11,
+      "userId": "guest-demo-judge",
+      "eventType": "logged_expense",
+      "xpAwarded": 10,
+      "description": "Daily action: logged expense",
+      "createdAt": "2026-05-23T13:26:45.207658+00:00"
+    },
+    "12": {
+      "id": 12,
+      "userId": "guest-demo-judge",
+      "eventType": "stayed_in_budget",
+      "xpAwarded": 20,
+      "description": "Daily action: stayed in budget",
+      "createdAt": "2026-05-23T13:26:47.488031+00:00"
+    },
+    "13": {
+      "id": 13,
+      "userId": "guest-demo-judge",
+      "eventType": "saved_to_goal",
+      "xpAwarded": 30,
+      "description": "Daily action: saved to goal",
+      "createdAt": "2026-05-23T13:26:48.685175+00:00"
     }
   },
   "chat_messages": {
@@ -390,6 +414,34 @@
       "role": "assistant",
       "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
       "createdAt": "2026-05-23T11:45:06.674690+00:00"
+    },
+    "17": {
+      "id": 17,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Plan my budget for today",
+      "createdAt": "2026-05-23T13:24:54.021920+00:00"
+    },
+    "18": {
+      "id": 18,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T13:24:54.049914+00:00"
+    },
+    "19": {
+      "id": 19,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Plan my budget for today",
+      "createdAt": "2026-05-23T13:24:59.085559+00:00"
+    },
+    "20": {
+      "id": 20,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM60 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T13:24:59.105369+00:00"
     }
   }
 }

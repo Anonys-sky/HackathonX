@@ -59,6 +59,7 @@ export default function Onboarding() {
   const [currency, setCurrency] = useState(DEFAULTS.currency);
   const [allocations, setAllocations] = useState(buildInitialAllocations);
 
+  const utils = trpc.useUtils();
   const setupProfile = trpc.profile.setup.useMutation();
   const setupWallets = trpc.wallets.setup.useMutation();
   const completeOnboarding = trpc.profile.completeOnboarding.useMutation();
@@ -109,6 +110,10 @@ export default function Onboarding() {
           })),
       });
       await completeOnboarding.mutateAsync();
+      await Promise.all([
+        utils.profile.get.invalidate(),
+        utils.profile.getStats.invalidate(),
+      ]);
       toast.success(t("common.success"));
       navigate("/dashboard");
     } catch (err) {

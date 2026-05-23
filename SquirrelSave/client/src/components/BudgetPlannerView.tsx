@@ -5,10 +5,10 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { SquirryMascot } from "@/components/SquirryMascot";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import { Send, Loader2, Sparkles } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WeeklyCalendarRibbon } from "@/components/wealth/WeeklyCalendarRibbon";
 import {
   BUDGET_PLANNER_CATEGORIES,
   BUDGET_STORAGE_KEY,
@@ -96,6 +96,16 @@ export function BudgetPlannerView() {
 
   const dailyTotal = sumDailyPlan(amounts);
 
+  const categoryLines = useMemo(() => {
+    return BUDGET_PLANNER_CATEGORIES.map((cat) => ({
+      ...cat,
+      label: t(cat.labelKey),
+      amount: amounts[cat.id] ?? 0,
+    }))
+      .filter((c) => c.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
+  }, [amounts, t]);
+
   useEffect(() => {
     const saved = plans[key];
     if (saved) {
@@ -118,26 +128,9 @@ export function BudgetPlannerView() {
     return base;
   }
 
-  function persistAmounts(next: Record<BudgetCategoryId, number>) {
-    setPlans((prev) => {
-      const updated = { ...prev, [key]: next };
-      savePlans(updated);
-      return updated;
-    });
-  }
-
-  function handleAmountChange(id: BudgetCategoryId, value: string) {
-    const num = parseFloat(value) || 0;
-    setAmounts((prev) => {
-      const next = { ...prev, [id]: num };
-      persistAmounts(next);
-      return next;
-    });
-  }
-
-  function handleSend() {
-    if (!input.trim() || planMutation.isPending) return;
-    const msg = input.trim();
+  function handleSend(text?: string) {
+    const msg = (text ?? input).trim();
+    if (!msg || planMutation.isPending) return;
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: msg, id: `${Date.now()}-u` }]);
     planMutation.mutate({
@@ -156,161 +149,139 @@ export function BudgetPlannerView() {
     t("wealth.budget_prompt_cheap"),
   ];
 
+  const dateLabel = selectedDate.toLocaleDateString("en-MY", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
+
   return (
-    <div className="pb-4">
-      <p className="text-xs text-muted-foreground mb-3 text-center">{t("wealth.budget_page_hint")}</p>
+    <div className="flex flex-col gap-3 pb-2">
+      <WeeklyCalendarRibbon
+        selected={selectedDate}
+        onSelect={setSelectedDate}
+        hasPlanForDate={(k) => {
+          const p = plans[k];
+          return !!p && sumDailyPlan(p) > 0;
+        }}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[520px]">
-        {/* AI chat — friend helps fill the form */}
-        <div className="flex flex-col bg-white rounded-2xl border border-border shadow-sm overflow-hidden min-h-[320px] lg:min-h-[480px]">
-          <div className="px-3 py-2 border-b border-border bg-[oklch(0.97_0.04_25)] flex items-center gap-2">
-            <SquirryMascot mood="happy" size={36} />
-            <div>
-              <p className="text-sm font-bold text-foreground">{t("wealth.budget_chat_title")}</p>
-              <p className="text-[10px] text-muted-foreground">{t("wealth.budget_chat_sub")}</p>
+      <div className="rounded-2xl border border-[oklch(0.92_0.03_85)] bg-gradient-to-br from-[oklch(0.99_0.02_85)] to-white p-4 shadow-sm">
+        <p className="text-[11px] font-semibold text-muted-foreground">{dateLabel}</p>
+        <div className="flex items-baseline justify-between gap-2 mt-1">
+          <p className="text-sm font-bold text-foreground">{t("wealth.budget_daily_summary")}</p>
+          <p className="text-2xl font-display text-[oklch(0.45_0.14_25)] tabular-nums">
+            {currency}
+            {dailyTotal.toLocaleString("en-MY", { maximumFractionDigits: 0 })}
+          </p>
+        </div>
+        {spentToday > 0 && (
+          <p className="text-[10px] text-muted-foreground mt-0.5">
+            {t("wealth.budget_spent_today")}: {currency}
+            {spentToday.toFixed(0)}
+          </p>
+        )}
+
+        {categoryLines.length > 0 ? (
+          <ul className="mt-3 space-y-1.5 border-t border-[oklch(0.94_0.02_85)] pt-3">
+            {categoryLines.map((line) => (
+              <li key={line.id} className="flex items-center gap-2 text-xs">
+                <span className="text-base w-5 shrink-0">{line.emoji}</span>
+                <span className="flex-1 font-medium text-foreground truncate">{line.label}</span>
+                <span className="font-bold text-foreground tabular-nums shrink-0">
+                  {currency}
+                  {line.amount.toLocaleString("en-MY", { maximumFractionDigits: 0 })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-[11px] text-muted-foreground mt-2">{t("wealth.budget_chat_empty")}</p>
+        )}
+      </div>
+
+      <div className="flex flex-col rounded-2xl border border-[oklch(0.92_0.02_25)] bg-[oklch(0.99_0.01_25)] shadow-sm overflow-hidden min-h-[340px]">
+        <div className="px-3 py-2.5 border-b border-[oklch(0.94_0.02_25)] bg-white flex items-center gap-2">
+          <SquirryMascot mood="happy" size={32} />
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-foreground truncate">{t("wealth.budget_chat_title")}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{t("wealth.budget_chat_sub")}</p>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[200px] max-h-[280px] bg-[oklch(0.97_0.008_25)]">
+          {messages.length === 0 && (
+            <div className="text-center py-6 px-2">
+              <p className="text-xs text-muted-foreground leading-relaxed">{t("wealth.budget_page_hint")}</p>
             </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[280px] lg:max-h-none">
-            {messages.length === 0 && (
-              <div className="text-center py-4 px-2">
-                <p className="text-sm text-muted-foreground">{t("wealth.budget_chat_empty")}</p>
-                <div className="flex flex-wrap gap-1.5 justify-center mt-3">
-                  {quickPrompts.map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setInput(p)}
-                      className="text-[10px] bg-muted rounded-full px-2.5 py-1 font-medium hover:bg-primary/10 hover:text-primary"
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            <AnimatePresence>
-              {messages.map((msg) => (
-                <motion.div
-                  key={msg.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+          )}
+          <AnimatePresence>
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+              >
+                <div
+                  className={cn(
+                    "max-w-[88%] rounded-2xl px-3 py-2 text-[13px] leading-relaxed shadow-sm",
+                    msg.role === "user"
+                      ? "bg-[oklch(0.55_0.14_25)] text-white rounded-br-md"
+                      : "bg-white text-foreground rounded-bl-md border border-border/60"
+                  )}
                 >
-                  <div
-                    className={cn(
-                      "max-w-[90%] rounded-2xl px-3 py-2 text-xs leading-relaxed",
-                      msg.role === "user"
-                        ? "bg-primary text-white rounded-tr-sm"
-                        : "bg-muted text-foreground rounded-tl-sm"
-                    )}
-                  >
-                    {msg.content}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {planMutation.isPending && (
-              <div className="flex gap-2 items-center">
-                <span className="text-lg">🐿️</span>
-                <div className="bg-muted rounded-2xl px-3 py-2 text-xs text-muted-foreground">
-                  {t("wealth.budget_thinking")}
+                  {msg.content}
                 </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {planMutation.isPending && (
+            <div className="flex justify-start">
+              <div className="bg-white border border-border/60 rounded-2xl rounded-bl-md px-3 py-2 text-xs text-muted-foreground flex items-center gap-2">
+                <Loader2 size={12} className="animate-spin text-primary" />
+                {t("wealth.budget_thinking")}
               </div>
-            )}
-            <div ref={bottomRef} />
-          </div>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
 
-          <div className="p-2 border-t border-border flex gap-2">
+        <div className="p-2.5 border-t border-[oklch(0.94_0.02_25)] bg-white space-y-2">
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
+            {quickPrompts.map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => handleSend(p)}
+                disabled={planMutation.isPending}
+                className="shrink-0 text-[11px] font-semibold rounded-full px-3 py-1.5 bg-[oklch(0.96_0.04_85)] text-[oklch(0.4_0.1_85)] border border-[oklch(0.9_0.04_85)] hover:bg-[oklch(0.94_0.06_85)] disabled:opacity-50"
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2 items-end">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
               placeholder={t("wealth.budget_chat_placeholder")}
-              className="rounded-xl text-sm h-9"
+              className="rounded-2xl text-sm h-10 bg-[oklch(0.97_0.008_25)] border-[oklch(0.92_0.02_25)]"
               disabled={planMutation.isPending}
             />
             <Button
               size="sm"
-              onClick={handleSend}
+              onClick={() => handleSend()}
               disabled={!input.trim() || planMutation.isPending}
-              className="rounded-xl h-9 w-9 p-0 shrink-0"
+              className="rounded-2xl h-10 w-10 p-0 shrink-0"
             >
               {planMutation.isPending ? (
-                <Loader2 size={14} className="animate-spin" />
+                <Loader2 size={16} className="animate-spin" />
               ) : (
-                <Send size={14} />
+                <Send size={16} />
               )}
             </Button>
-          </div>
-        </div>
-
-        {/* Budget sheet — calendar + categories */}
-        <div className="bg-white rounded-2xl border border-border shadow-sm p-4 flex flex-col">
-          <p className="text-sm font-bold text-foreground mb-1 flex items-center gap-1">
-            <Sparkles size={14} className="text-primary" />
-            {t("wealth.budget_sheet_title")}
-          </p>
-          <p className="text-[10px] text-muted-foreground mb-3">{t("wealth.budget_sheet_sub")}</p>
-
-          <div className="flex flex-col gap-4">
-            <p className="text-xs font-semibold text-foreground">
-              {selectedDate.toLocaleDateString("en-MY", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-
-            <div className="flex flex-col items-center w-full">
-              <div className="w-full max-w-[280px]">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={(d) => d && setSelectedDate(d)}
-                  className="w-full rounded-xl border border-border [--cell-size:2.5rem]"
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-1.5">{t("wealth.budget_click_day")}</p>
-            </div>
-
-            <div className="space-y-2">
-              {BUDGET_PLANNER_CATEGORIES.map((cat) => (
-                <div key={cat.id} className="flex items-center gap-2">
-                  <span className="text-base w-6 shrink-0">{cat.emoji}</span>
-                  <label className="text-xs font-medium text-foreground flex-1 min-w-0 truncate">
-                    {t(cat.labelKey)}
-                  </label>
-                  <div className="flex items-center gap-1 w-28 shrink-0">
-                    <span className="text-xs text-muted-foreground">{currency}</span>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={1}
-                      value={amounts[cat.id] || ""}
-                      onChange={(e) => handleAmountChange(cat.id, e.target.value)}
-                      className="h-8 text-xs rounded-lg text-right font-semibold"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="p-3 rounded-xl bg-[oklch(0.96_0.04_25)] border border-primary/20">
-              <p className="text-xs text-muted-foreground">{t("wealth.budget_daily_summary")}</p>
-              <p className="text-2xl font-display text-primary">
-                {currency}
-                {dailyTotal.toLocaleString("en-MY", { maximumFractionDigits: 0 })}
-              </p>
-              {spentToday > 0 && (
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {t("wealth.budget_spent_today")}: {currency}
-                  {spentToday.toFixed(0)}
-                </p>
-              )}
-            </div>
           </div>
         </div>
       </div>

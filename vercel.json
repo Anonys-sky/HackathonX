@@ -10,6 +10,7 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/SquirrelSave/api/index" },
-    { "source": "/api", "destination": "/SquirrelSave/api/index" }
+    { "source": "/api", "destination": "/SquirrelSave/api/index" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

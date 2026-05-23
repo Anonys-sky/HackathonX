@@ -1,37 +1,74 @@
 # SquirryCoach — AI Wealth Coach
 
-Gamified personal finance for students and young adults in Malaysia. Track spending in **ringgit**, build savings streaks, and let **Squirry** (your AI squirrel buddy) plan budgets, parse messy bank text, and nudge you before you overspend.
+Gamified personal finance for **students and young adults in Malaysia**. Track spending in **ringgit (RM)**, see **how much you can spend today**, build **budget streaks**, and let **Squirry** help you plan, scan receipts, and stay on track.
 
-Built for **HackathonX** — full-stack PWA with **Continue without login** for judges and demos.
+Built for **HackathonX** — mobile-first **PWA** with **Continue without login** for judges and demos.
 
 ---
 
 ## The problem
 
-Students know they should budget, but most apps feel like homework: manual entry, charts in percentages, and no one tells you **how much money you have left today** in plain RM.
+Young adults in Malaysia often hit mid-month with little left in the bank, avoid checking balances, and lose track of small daily spends (Grab, TnG, Shopee). Most finance apps feel like homework: manual entry, charts in percentages, and no plain answer to **“how much can I spend today?”**
 
 ## Our solution
 
 | Pain | SquirryCoach answer |
 |------|---------------------|
-| Messy Grab / e-wallet text | **AI transaction parser** — paste raw text, get categorized rows |
-| Lazy to fill budget forms | **Chat budget planner** — talk to Squirry; it fills Food, Groceries, etc. in RM |
-| Easy to forget saving | **Gamification** — XP, levels, streaks, social leaderboard |
-| “How much can I spend?” | **Dashboard** — large Saving / Spending donuts with **RM left** per wallet |
-| Need a nudge | **Squirry bubble** on home — save reminders, overspend warnings, celebration after logging |
+| Messy bank / e-wallet alerts | **Smart Scan** — paste text or **photo OCR** (Tesseract.js in browser) |
+| Lazy to fill budget forms | **Wealth → Budget** — chat with Squirry; daily sheet fills in RM by category |
+| Easy to forget saving | **XP, levels, streaks**, and a **League** ranked by discipline (not wealth) |
+| “How much can I spend?” | **Safe to Spend Today** — spending wallet remaining ÷ days left in month |
+| Need a nudge | **Squirry coach** — overspend alerts + tips (LLM when configured, smart local fallback otherwise) |
+
+---
+
+## How it works
+
+```
+User input          Processing                         Output
+──────────          ──────────                         ──────
+Manual log          Keyword categorization             Safe to Spend Today (RM)
+Smart Scan (OCR     Rules + budget math                Savings / Spending donuts
+  or paste SMS)     Optional LLM coach               League (streak rank)
+Onboarding          Optional LLM budget chat           Goals, XP, overspend alerts
+(50/30/20 split)
+```
+
+**Honest AI model:** Core flows work **without API keys** (OCR + heuristics + local coach templates). Connect **Gemini / Groq / OpenAI-compatible** APIs to enhance parsing and chat when credits are available.
 
 ---
 
 ## Features
 
-- **Continue without login** — judges start instantly as a demo guest
-- **Onboarding** — custom wallet split with 50/30/20 recommendation  
-- **Dashboard** — Saving vs Spending allocation charts, search, daily date, Squirry nudges  
-- **Activity** — ledger + AI parser for bank/e-wallet paste  
-- **Wealth → Budget** — calendar daily plan, AI chat fills category amounts  
-- **Goals** — savings goals with progress  
-- **Social** — streaks and friend leaderboard  
-- **i18n** — English & Bahasa Malaysia  
+### Home & onboarding
+- **Continue without login** — instant demo guest for judges
+- **Onboarding** — monthly income (RM), wallet split with **50/30/20** recommendation
+
+### Dashboard
+- **Safe to Spend Today** — daily RM you can still spend from Needs/Wants wallets
+- **Saving / Spending** progress donuts with **RM left** per allocation
+- **Monthly income** card, XP bar, streak, Squirry nudges
+- **Log Transaction** FAB → Activity
+
+### Activity
+- Date-grouped transaction feed
+- **Manual log** — numpad, merchant, required category chips
+- **Smart Scan** — paste bank/e-wallet text **or** receipt/screenshot **OCR** (client-side)
+
+### Wealth Coach
+- **Budget** — weekly calendar ribbon, daily summary card, WhatsApp-style **AI budget buddy** chat
+- **Progress** — level card, daily action checklist, XP history grouped by day
+- **Invest** — educational platform cards (Versa, StashAway, Wahed, Luno) with disclaimers
+
+### Social
+- **League** — leaderboard by **budget streak days** (friends + campus demo tab)
+- Badges sheet, add friend, poke/remind
+
+### Goals
+- Savings goals with progress and add funds
+
+### Other
+- **English & Bahasa Malaysia** (i18n)
 
 ---
 
@@ -39,12 +76,15 @@ Students know they should budget, but most apps feel like homework: manual entry
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React 19, Vite, Tailwind CSS 4, shadcn/ui, Recharts, Framer Motion |
-| API | REST (`/api/*`) via React Query shim (replaces tRPC client-side) |
-| Backend | **Python FastAPI** + Uvicorn |
-| Data | **Local JSON** (`DATA_BACKEND=local`, default) or **Firebase Firestore** |
-| AI | OpenAI-compatible API (`gpt-4o-mini` default) + **offline fallback** when quota fails |
-| Legacy (optional) | Node + Express + tRPC + MySQL — `npm run dev:legacy` |
+| **Frontend** | **React 19 + Vite** PWA (mobile-first; works in phone browser) |
+| **UI** | Tailwind CSS 4, shadcn/ui, Recharts, Framer Motion |
+| **API client** | REST (`/api/*`) + React Query (tRPC-compatible shim) |
+| **Backend** | **Python FastAPI** + Uvicorn |
+| **Data** | **Local JSON** (default, `DATA_BACKEND=local`) or **Firebase Firestore** (`DATA_BACKEND=firebase`) |
+| **Scan** | **Tesseract.js** (browser OCR) + heuristic text parser |
+| **Intelligence** | **Rules / heuristics** + optional **LLM** (Gemini/Groq/OpenAI-compatible) for coach & budget chat |
+| **Deploy** | Vercel (static PWA + Python serverless `/api`) or Railway/Render/Fly (full FastAPI + static) |
+| **Legacy (optional)** | Node + Express + tRPC + MySQL — `npm run dev:legacy` |
 
 ---
 
@@ -60,7 +100,7 @@ Students know they should budget, but most apps feel like homework: manual entry
 ```bash
 cd SquirrelSave
 cp .env.example .env
-# Add LLM_API_KEY (or keep LLM_FALLBACK_ENABLED=true for demo)
+# Optional: LLM_API_KEY — or keep LLM_LOCAL_ONLY=true for offline coach/parser
 pip install -r backend/requirements.txt
 npm install --legacy-peer-deps
 npm run dev
@@ -71,9 +111,9 @@ This starts:
 - **API** — http://127.0.0.1:8000 (FastAPI)
 - **Web** — http://localhost:3000 (Vite; proxies `/api` to the API)
 
-On the **Home** screen, tap **Continue without login** (or complete onboarding as the demo guest).
+On **Home**, tap **Continue without login**, then complete onboarding or open the dashboard.
 
-See [SETUP.md](./SETUP.md) for troubleshooting, Groq as a free LLM, and Firebase.
+See [SETUP.md](./SETUP.md) for troubleshooting, Groq/Gemini keys, and Firestore setup.
 
 ---
 
@@ -85,12 +125,14 @@ Copy `.env.example` → `.env`. Never commit secrets.
 |----------|---------|
 | `DATA_BACKEND` | `local` (JSON file) or `firebase` (Firestore) |
 | `DEMO_USER_ID` | Guest user id for judge/demo mode |
-| `LLM_API_URL` | OpenAI or compatible base URL |
-| `LLM_API_KEY` | API key for coach + parser |
-| `LLM_MODEL` | e.g. `gpt-4o-mini` |
-| `LLM_FALLBACK_ENABLED` | `true` = local coach/parser when API fails |
+| `LLM_API_URL` | OpenAI-compatible base URL (Gemini, Groq, etc.) |
+| `LLM_API_KEY` | API key for coach + budget planner |
+| `LLM_MODEL` | e.g. `gemini-2.0-flash` |
+| `LLM_FALLBACK_ENABLED` | `true` = heuristic/local replies when API fails |
+| `LLM_LOCAL_ONLY` | `true` = skip remote LLM (demo-friendly) |
 | `FIREBASE_PROJECT_ID` | Required when `DATA_BACKEND=firebase` |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` | Service account JSON (one line) for Firestore |
+| `VITE_API_URL` | Production API origin (if frontend hosted separately) |
 | `VITE_APP_NAME` | Brand name in UI (default `SquirryCoach`) |
 | `DEFAULT_CURRENCY` | e.g. `RM` |
 
@@ -100,17 +142,21 @@ Copy `.env.example` → `.env`. Never commit secrets.
 
 ```
 SquirrelSave/
+├── api/                      # Vercel serverless entry (wraps FastAPI)
 ├── backend/
 │   ├── app/main.py           # FastAPI routes
 │   ├── app/store/            # local JSON + Firestore adapters
-│   └── app/services/         # LLM, gamification, spending
+│   └── app/services/         # LLM, heuristics, gamification, spending
 ├── client/src/
-│   ├── pages/                # Route screens
-│   ├── components/           # UI, Squirry, activity, dashboard
-│   └── lib/api/              # REST client + tRPC-compatible hooks
-├── shared/                   # Config, schemas, gamification, budget planner
+│   ├── pages/                # Home, Dashboard, Activity, Social, Wealth, Goals
+│   ├── components/           # dashboard/, activity/, social/, wealth/
+│   └── lib/
+│       ├── api/              # REST client + React Query shim
+│       ├── receiptOcr.ts     # Tesseract.js wrapper
+│       └── budgetCycle.ts    # Safe to spend, wallet math
+├── shared/                   # Config, budget planner categories, coach nudges
 ├── server/                   # Legacy Node/tRPC (optional)
-└── dist/public/              # Vite build (served by FastAPI in production)
+└── dist/public/              # Vite production build
 ```
 
 ---
@@ -118,19 +164,20 @@ SquirrelSave/
 ## Development
 
 ```bash
-npm run dev          # FastAPI :8000 + Vite :3000
+npm run dev          # FastAPI :8000 + Vite :3000 (recommended)
 npm run dev:legacy   # Old Node + MySQL stack
 npm run check        # TypeScript
-npm test             # Vitest (shared + legacy router tests)
+npm test             # Vitest
+npm run test:api     # pytest (backend)
 npm run build        # Production client bundle
 npm start            # Uvicorn serves API + static dist
 ```
 
 ### Adding a feature
 
-1. **API** — add route in `backend/app/main.py` and store methods in `backend/app/store/`
-2. **Client** — extend `client/src/lib/api/client.ts` and `trpc-shim.ts`
-3. **UI** — `client/src/pages/` + hooks
+1. **API** — route in `backend/app/main.py`, persistence in `backend/app/store/`
+2. **Client** — `client/src/lib/api/client.ts` and `trpc-shim.ts`
+3. **UI** — `client/src/pages/` and `client/src/components/`
 
 Demo mode sends `X-Demo-Mode: true` and uses `DEMO_USER_ID` — no Firebase Auth required for judges.
 
@@ -138,18 +185,44 @@ Demo mode sends `X-Demo-Mode: true` and uses `DEMO_USER_ID` — no Firebase Auth
 
 ## Demo flow (for judges)
 
-1. **Home** → **Continue without login**  
-2. **Onboarding** or **Dashboard** — Saving / Spending in RM; read Squirry nudge  
-3. **Activity → AI Parser** — paste sample transaction text  
-4. **Wealth → Budget** — “Plan my budget for today” → Squirry fills amounts  
-5. **Goals / Social** — savings target + streaks  
+1. **Home** → **Continue without login**
+2. **Onboarding** — income + wallet split (or skip if already complete)
+3. **Dashboard** — note **Safe to Spend Today** and Saving/Spending donuts (RM)
+4. **Activity** → **Smart Scan** — paste sample TnG/Grab text or upload a receipt image
+5. **Activity** → **Manual log** — amount + category in three taps
+6. **Wealth → Budget** — “Plan my budget for today” → Squirry fills daily categories
+7. **Social → League** — streak ranking (not account balance)
+8. **Goals** — create or view a savings target
+
+**Sample paste for Smart Scan:**
+
+```
+TNG*SHP MYR 15.50
+GRAB FOOD 23.80
+MBB PETRON 45.00
+```
 
 ---
 
-## Deployment notes
+## Deployment
 
-- **Full stack**: deploy FastAPI (`npm start` after `npm run build`) on Railway, Render, Fly.io, etc. The API serves the built SPA from `dist/public`.
-- **Vercel (frontend only)**: set `VITE_API_URL` to your hosted API origin; Vercel cannot run the Python API in the same project by default.
+### Vercel (this repo)
+
+`vercel.json` builds the PWA and routes `/api/*` to the Python function (`api/index.py`). SPA routes rewrite to `index.html`.
+
+```bash
+npm run build
+# Deploy from SquirrelSave/ (or monorepo root with root vercel.json)
+```
+
+### Full stack (Railway, Render, Fly.io)
+
+```bash
+npm run build
+npm start   # FastAPI serves dist/public + /api
+```
+
+Set `DATA_BACKEND=firebase` and Firestore credentials for persistent multi-user data in production.
 
 ---
 
@@ -159,7 +232,8 @@ Demo mode sends `X-Demo-Mode: true` and uses `DEMO_USER_ID` — no Firebase Auth
 |---------|-------------|
 | `npm run dev` | FastAPI + Vite (recommended) |
 | `npm run dev:legacy` | Node + embedded MySQL |
-| `npm run test` | Unit tests |
+| `npm run test` | Vitest (client/shared) |
+| `npm run test:api` | pytest (backend) |
 | `npm run check` | `tsc --noEmit` |
 | `npm run build` | Build client for production |
 | `npm start` | Production API + static files |
@@ -174,4 +248,4 @@ MIT — see [package.json](./package.json).
 
 **SquirryCoach** — finance that feels like texting a friend, not doing accounting.
 
-Questions or setup issues → [SETUP.md](./SETUP.md).
+Setup help → [SETUP.md](./SETUP.md).

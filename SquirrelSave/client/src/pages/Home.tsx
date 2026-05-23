@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -13,18 +15,25 @@ import { apiClient } from "@/lib/api/client";
 
 export default function Home() {
   const [, navigate] = useLocation();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const { language, setLanguage } = useLanguage();
   const profileQuery = trpc.profile.get.useQuery();
 
+  useEffect(() => {
+    if (!profileQuery.isSuccess || profileQuery.data === undefined) return;
+    const target = profileQuery.data?.onboardingComplete ? "/dashboard" : "/onboard";
+    navigate(target);
+  }, [profileQuery.isSuccess, profileQuery.data, navigate]);
+
   async function continueWithoutLogin() {
     await apiClient.auth.demo();
+    await queryClient.invalidateQueries({ queryKey: ["profile"] });
     const profile = await apiClient.profile.get();
     navigate(profile?.onboardingComplete ? "/dashboard" : "/onboard");
   }
 
   if (profileQuery.isSuccess) {
-    navigate(profileQuery.data?.onboardingComplete ? "/dashboard" : "/onboard");
     return null;
   }
 
