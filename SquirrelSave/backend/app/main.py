@@ -155,12 +155,14 @@ def profile_get(user: dict = Depends(get_current_user)):
 @app.post("/api/profile/setup")
 def profile_setup(body: ProfileSetup, user: dict = Depends(get_current_user)):
     uid = user_uid(user)
+    existing = get_store().get_profile(uid) or {}
     get_store().upsert_profile(
         uid,
         {
             "monthlyIncome": body.monthlyIncome,
             "currency": body.currency,
-            "onboardingComplete": False,
+            # Do not reset onboarding if user is updating income mid-session
+            "onboardingComplete": existing.get("onboardingComplete", False),
         },
     )
     return {"success": True}

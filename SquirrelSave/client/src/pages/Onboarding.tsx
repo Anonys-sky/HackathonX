@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Slider } from "@/components/ui/slider";
 import { SquirryMascot } from "@/components/SquirryMascot";
 import { useTranslation } from "@/hooks/useTranslation";
 import { trpc } from "@/lib/trpc";
+import { apiClient } from "@/lib/api/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronRight, ChevronLeft, Wallet, Coins, Shield, Sparkles, RotateCcw } from "lucide-react";
 import {
@@ -59,10 +61,17 @@ export default function Onboarding() {
   const [currency, setCurrency] = useState(DEFAULTS.currency);
   const [allocations, setAllocations] = useState(buildInitialAllocations);
 
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
+  const profileQuery = trpc.profile.get.useQuery();
   const setupProfile = trpc.profile.setup.useMutation();
   const setupWallets = trpc.wallets.setup.useMutation();
   const completeOnboarding = trpc.profile.completeOnboarding.useMutation();
+
+  useEffect(() => {
+    if (profileQuery.isSuccess && profileQuery.data?.onboardingComplete) {
+      navigate("/dashboard");
+    }
+  }, [profileQuery.isSuccess, profileQuery.data?.onboardingComplete, navigate]);
 
   const totalPercent = allocations.reduce((s, a) => s + a.percent, 0);
   const incomeNum = parseFloat(income) || 0;
@@ -110,10 +119,15 @@ export default function Onboarding() {
           })),
       });
       await completeOnboarding.mutateAsync();
-      await Promise.all([
-        utils.profile.get.invalidate(),
-        utils.profile.getStats.invalidate(),
+      const [profile, stats] = await Promise.all([
+        apiClient.profile.get(),
+        apiClient.profile.getStats(),
       ]);
+      queryClient.setQueryData(["profile", "get"], profile);
+      queryClient.setQueryData(["profile", "stats"], stats);
+      if (!stats?.profile?.onboardingComplete) {
+        throw new Error("Onboarding could not be saved. Check that the API is running.");
+      }
       toast.success(t("common.success"));
       navigate("/dashboard");
     } catch (err) {

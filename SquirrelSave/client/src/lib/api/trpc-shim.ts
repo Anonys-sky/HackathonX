@@ -60,8 +60,14 @@ export const trpc = {
         },
       },
       profile: {
-        get: { invalidate: () => qc.invalidateQueries({ queryKey: ["profile", "get"] }) },
-        getStats: { invalidate: () => qc.invalidateQueries({ queryKey: ["profile", "stats"] }) },
+        get: {
+          invalidate: () => qc.invalidateQueries({ queryKey: ["profile", "get"] }),
+          refetch: () => qc.refetchQueries({ queryKey: ["profile", "get"] }),
+        },
+        getStats: {
+          invalidate: () => qc.invalidateQueries({ queryKey: ["profile", "stats"] }),
+          refetch: () => qc.refetchQueries({ queryKey: ["profile", "stats"] }),
+        },
       },
       goals: { list: { invalidate: () => qc.invalidateQueries({ queryKey: ["goals"] }) } },
       streaks: { list: { invalidate: () => qc.invalidateQueries({ queryKey: ["streaks"] }) } },
