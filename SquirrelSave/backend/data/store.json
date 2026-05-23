@@ -6,7 +6,8 @@
     "goal": 0,
     "streak": 1,
     "xp": 13,
-    "chat": 20
+    "chat": 22,
+    "streak_pot": 1
   },
   "users": {
     "guest-demo-judge": {
@@ -18,7 +19,7 @@
       "role": "user",
       "createdAt": "2026-05-23T09:51:55.637227+00:00",
       "updatedAt": "2026-05-23T09:51:55.637227+00:00",
-      "lastSignedIn": "2026-05-23T13:57:29.944449+00:00"
+      "lastSignedIn": "2026-05-23T14:35:27.931352+00:00"
     }
   },
   "profiles": {
@@ -27,7 +28,7 @@
       "currency": "RM",
       "onboardingComplete": true,
       "userId": "guest-demo-judge",
-      "updatedAt": "2026-05-23T13:35:49.389301+00:00",
+      "updatedAt": "2026-05-23T14:34:32.308583+00:00",
       "createdAt": "2026-05-23T10:58:46.758024+00:00",
       "xpPoints": 355,
       "level": 1,
@@ -442,6 +443,81 @@
       "role": "assistant",
       "content": "Done! I filled about RM60 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
       "createdAt": "2026-05-23T13:24:59.105369+00:00"
+    },
+    "21": {
+      "id": 21,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Plan my budget for today",
+      "createdAt": "2026-05-23T14:35:27.960495+00:00"
+    },
+    "22": {
+      "id": 22,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:35:27.987769+00:00"
+    }
+  },
+  "streak_pots": {
+    "1": {
+      "id": 1,
+      "name": "Weekly pot \u00b7 2026-W21",
+      "weekKey": "2026-W21",
+      "stakeAmount": 10.0,
+      "currency": "RM",
+      "simulated": true,
+      "potTotal": 30.0,
+      "createdAt": "2026-05-23T14:18:50.738525+00:00",
+      "members": [
+        {
+          "uid": "npc-danial",
+          "displayName": "Danial",
+          "avatar": "\ud83e\uddd1",
+          "isNpc": true,
+          "staked": true,
+          "breachedToday": false,
+          "forfeited": 0.0,
+          "won": 20.0,
+          "todayCheckedAt": "2026-05-23",
+          "wonXp": 30
+        },
+        {
+          "uid": "npc-aiman",
+          "displayName": "Aiman",
+          "avatar": "\ud83d\udc68",
+          "isNpc": true,
+          "staked": true,
+          "breachedToday": false,
+          "forfeited": 0.0,
+          "won": 20.0,
+          "todayCheckedAt": "2026-05-23",
+          "wonXp": 30
+        },
+        {
+          "uid": "guest-demo-judge",
+          "displayName": "Guest Judge",
+          "avatar": "\ud83d\udc3f\ufe0f",
+          "isNpc": false,
+          "staked": true,
+          "breachedToday": true,
+          "forfeited": 40.0,
+          "won": 0.0,
+          "todayCheckedAt": "2026-05-23",
+          "forfeitedXp": 60
+        }
+      ],
+      "lastSettledAt": "2026-05-23T14:35:04.372855+00:00",
+      "settlement": {
+        "losers": [
+          "Guest Judge"
+        ],
+        "winners": [
+          "Danial",
+          "Aiman"
+        ],
+        "shareXpEach": 5
+      }
     }
   }
 }

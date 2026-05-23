@@ -27,14 +27,20 @@ Young adults in Malaysia often hit mid-month with little left in the bank, avoid
 ```
 User input          Processing                         Output
 ──────────          ──────────                         ──────
-Manual log          Keyword categorization             Safe to Spend Today (RM)
-Smart Scan (OCR     Rules + budget math                Savings / Spending donuts
-  or paste SMS)     Optional LLM coach               League (streak rank)
-Onboarding          Optional LLM budget chat           Goals, XP, overspend alerts
+Manual log          On-device rules (browser)          Safe to Spend Today (RM)
+Smart Scan (OCR     Weather + exam context             Context-adjusted daily limit
+  or paste SMS)     Optional LLM coach               Streak Pot (XP stakes)
+Onboarding          Budget math                        League, Goals, XP, alerts
 (50/30/20 split)
 ```
 
-**Honest AI model:** Core flows work **without API keys** (OCR + heuristics + local coach templates). Connect **Gemini / Groq / OpenAI-compatible** APIs to enhance parsing and chat when credits are available.
+### Hackathon MVP innovations
+
+1. **Streak Pot (Anti-Budget)** — Social → wager **50 XP** with friends (Danial & Aiman demo). Stay under **Safe to Spend** or forfeit XP to winners. *Gamified accountability — no real money.*
+2. **Context engine** — Open-Meteo rain near **Gelugor** + exam-period buffer lowers today's Safe to Spend with Squirry nudges.
+3. **Zero-trust scan** — Tesseract OCR + `parseBankText` run **in the browser**; only confirmed rows are sent to the API.
+
+**Honest AI model:** Core flows work **without API keys**. Connect **Gemini / Groq** to enhance coach & budget chat when credits are available.
 
 ---
 
@@ -45,7 +51,8 @@ Onboarding          Optional LLM budget chat           Goals, XP, overspend aler
 - **Onboarding** — monthly income (RM), wallet split with **50/30/20** recommendation
 
 ### Dashboard
-- **Safe to Spend Today** — daily RM you can still spend from Needs/Wants wallets
+- **Safe to Spend Today** — daily RM you can still spend (may be **lowered** for rain / exam buffer)
+- **Context banner** — predictive nudges (weather, finals week)
 - **Saving / Spending** progress donuts with **RM left** per allocation
 - **Monthly income** card, XP bar, streak, Squirry nudges
 - **Log Transaction** FAB → Activity
@@ -191,8 +198,9 @@ Demo mode sends `X-Demo-Mode: true` and uses `DEMO_USER_ID` — no Firebase Auth
 4. **Activity** → **Smart Scan** — paste sample TnG/Grab text or upload a receipt image
 5. **Activity** → **Manual log** — amount + category in three taps
 6. **Wealth → Budget** — “Plan my budget for today” → Squirry fills daily categories
-7. **Social → League** — streak ranking (not account balance)
-8. **Goals** — create or view a savings target
+7. **Social → Streak Pot** — stake 50 XP, check in, settle week (winners earn XP)
+8. **Social → League** — streak ranking (not account balance)
+9. **Goals** — create or view a savings target
 
 **Sample paste for Smart Scan:**
 

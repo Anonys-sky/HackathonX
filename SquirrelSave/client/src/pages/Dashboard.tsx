@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -25,6 +26,8 @@ import { ProgressDonutCard } from "@/components/dashboard/ProgressDonutCard";
 import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { DashboardGamificationBar } from "@/components/dashboard/DashboardGamificationBar";
 import { SafeToSpendCard } from "@/components/dashboard/SafeToSpendCard";
+import { contextMessageKeys, loadSpendingContext } from "@/lib/contextEngine";
+import type { SquirryContextInsight } from "@/components/SquirryNudgeBubble";
 import { LogTransactionFab } from "@/components/dashboard/LogTransactionFab";
 import { CATEGORY_META } from "@shared/config";
 import { ChevronRight, Bell, Coins, Wallet, AlertTriangle } from "lucide-react";
@@ -134,10 +137,27 @@ export default function Dashboard() {
     if (needsOnboarding) navigate("/onboard");
   }, [needsOnboarding, navigate]);
 
+  const walletsForHooks = (stats?.wallets ?? []) as WalletRow[];
+  const spendingRemainingForHooks = useMemo(
+    () => sumWallets(walletsForHooks, SPENDING_WALLET_TYPES, (w) => w.currentBalance),
+    [stats?.wallets]
+  );
+  const safeToSpendToday = useMemo(
+    () => safeToSpendDaily(spendingRemainingForHooks),
+    [spendingRemainingForHooks]
+  );
+
+  const contextQuery = useQuery({
+    queryKey: ["spending-context", Math.round(safeToSpendToday * 100)],
+    queryFn: () => loadSpendingContext(safeToSpendToday),
+    enabled: !statsQuery.isLoading && !needsOnboarding && safeToSpendToday > 0,
+    staleTime: 15 * 60 * 1000,
+  });
+
   if (statsQuery.isLoading) return <DashboardSkeleton />;
   if (needsOnboarding) return null;
 
-  const wallets = (stats?.wallets ?? []) as WalletRow[];
+  const wallets = walletsForHooks;
   const alerts = alertsQuery.data ?? [];
   const hasAlert = alerts.some((a) => a.isAlert);
   const mood: MascotMood = hasAlert
@@ -172,11 +192,38 @@ export default function Dashboard() {
   const spendingSpent = sumWallets(wallets, SPENDING_WALLET_TYPES, (w) =>
     walletSpent(w.allocatedAmount, w.currentBalance)
   );
-  const spendingRemaining = sumWallets(wallets, SPENDING_WALLET_TYPES, (w) => w.currentBalance);
+  const spendingRemaining = spendingRemainingForHooks;
 
   const daysLeft = daysLeftInMonth();
-  const safeToSpendToday = safeToSpendDaily(spendingRemaining);
   const daysLeftLabel = t("dashboard.days_left_cycle").replace("{{days}}", String(daysLeft));
+
+  const spendingCtx = contextQuery.data;
+  const displaySafeToday = spendingCtx?.adjustedSafeDaily ?? safeToSpendToday;
+  const ctxKeys = spendingCtx ? contextMessageKeys(spendingCtx) : null;
+  const ctxMessage = ctxKeys
+    ? t(ctxKeys.messageKey)
+        .replace("{{campus}}", String(ctxKeys.params.campus ?? ""))
+        .replace("{{surge}}", String(ctxKeys.params.surge ?? ""))
+        .replace("{{runway}}", String(ctxKeys.params.runway ?? ""))
+        .replace("{{days}}", String(ctxKeys.params.days ?? ""))
+        .replace("{{label}}", String(ctxKeys.params.label ?? ""))
+        .replace("{{percent}}", String(ctxKeys.params.percent ?? ""))
+    : null;
+
+  const contextInsight: SquirryContextInsight | undefined = spendingCtx
+    ? {
+        message: ctxMessage,
+        kind: spendingCtx.weather?.isRaining
+          ? "rain"
+          : spendingCtx.exam?.active
+            ? "exam"
+            : spendingCtx.exam
+              ? "exam_soon"
+              : undefined,
+        showAdjustedNote:
+          spendingCtx.adjustedSafeDaily < spendingCtx.baseSafeDaily - 0.5,
+      }
+    : undefined;
 
   const streakTitle = t("dashboard.streak_finance_hint");
 
@@ -205,7 +252,12 @@ export default function Dashboard() {
         />
 
         <SafeToSpendCard
-          amount={safeToSpendToday}
+          amount={displaySafeToday}
+          baseAmount={
+            spendingCtx && spendingCtx.adjustedSafeDaily < spendingCtx.baseSafeDaily - 0.5
+              ? spendingCtx.baseSafeDaily
+              : undefined
+          }
           currency={currency}
           label={t("dashboard.safe_to_spend")}
           daysLeft={daysLeft}
@@ -388,13 +440,14 @@ export default function Dashboard() {
       <SquirryNudgeBubble
         variant="dashboard"
         justUploadedTx={justUploadedTx}
+        contextInsight={contextInsight}
         context={{
           userName,
           currency,
           todayExpenseTotal: todayStats.expenseTotal,
           todayTxCount: todayStats.count,
           spendingPercent,
-          safeToSpend: safeToSpendToday,
+          safeToSpend: displaySafeToday,
           monthlyIncome,
           hasBudgetAlert: hasAlert,
           streak,

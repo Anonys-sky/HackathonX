@@ -27,6 +27,7 @@ DEFAULT_STORE: dict[str, Any] = {
         "streak": 0,
         "xp": 0,
         "chat": 0,
+        "streak_pot": 0,
     },
     "users": {},
     "profiles": {},
@@ -36,6 +37,7 @@ DEFAULT_STORE: dict[str, Any] = {
     "streaks": {},
     "xp_events": {},
     "chat_messages": {},
+    "streak_pots": {},
 }
 
 
@@ -369,3 +371,155 @@ class LocalStore:
             }
 
         self._mutate(work)
+
+    # ── Streak pots (simulated staking) ───────────────────────────────────
+
+    def _ensure_pots_bucket(self, data: dict) -> None:
+        data.setdefault("streak_pots", {})
+        data["counters"].setdefault("streak_pot", 0)
+
+    def list_streak_pots(self, uid: str) -> list[dict]:
+        def work(data):
+            self._ensure_pots_bucket(data)
+            pots = []
+            for p in data["streak_pots"].values():
+                if any(m.get("uid") == uid for m in p.get("members", [])):
+                    pots.append(p)
+            pots.sort(key=lambda x: x.get("createdAt", ""), reverse=True)
+            return pots
+
+        return self._mutate(work)
+
+    def create_streak_pot(self, uid: str, creator_name: str, stake_xp: int) -> dict:
+        from app.services.streak_pot import _week_key
+
+        def work(data):
+            self._ensure_pots_bucket(data)
+            pid = self._next_id(data, "streak_pot")
+            week = _week_key()
+            stake = int(stake_xp)
+            member_base = {
+                "staked": True,
+                "breachedToday": False,
+                "forfeitedXp": 0,
+                "wonXp": 0,
+            }
+            pot = {
+                "id": pid,
+                "name": f"Weekly XP pot · {week}",
+                "weekKey": week,
+                "stakeXp": stake,
+                "rewardType": "xp",
+                "potTotalXp": stake * 3,
+                "createdAt": _now_iso(),
+                "members": [
+                    {
+                        **member_base,
+                        "uid": uid,
+                        "displayName": creator_name or "You",
+                        "avatar": "🐿️",
+                        "isNpc": False,
+                    },
+                    {
+                        **member_base,
+                        "uid": "npc-danial",
+                        "displayName": "Danial",
+                        "avatar": "🧑",
+                        "isNpc": True,
+                    },
+                    {
+                        **member_base,
+                        "uid": "npc-aiman",
+                        "displayName": "Aiman",
+                        "avatar": "👨",
+                        "isNpc": True,
+                    },
+                ],
+            }
+            data["streak_pots"][str(pid)] = pot
+            return pot
+
+        return self._mutate(work)
+
+    def get_streak_pot(self, pot_id: int) -> dict | None:
+        return self._load().get("streak_pots", {}).get(str(pot_id))
+
+    def update_streak_pot(self, pot_id: int, fields: dict) -> dict | None:
+        def work(data):
+            self._ensure_pots_bucket(data)
+            key = str(pot_id)
+            if key not in data["streak_pots"]:
+                return None
+            data["streak_pots"][key].update(fields)
+            return data["streak_pots"][key]
+
+        return self._mutate(work)
+
+    def settle_streak_pot(self, pot_id: int, uid: str) -> dict | None:
+        """Weekly settlement: breachers forfeit XP stake; winners earn XP (no real money)."""
+        from app.config import get_settings
+        from app.gamification import compute_level
+
+        def work(data):
+            self._ensure_pots_bucket(data)
+            key = str(pot_id)
+            pot = data["streak_pots"].get(key)
+            if not pot:
+                return None
+
+            stake = int(pot.get("stakeXp") or pot.get("stakeAmount") or 50)
+            members = []
+            losers = []
+            winners = []
+
+            for m in pot.get("members", []):
+                breached = bool(m.get("breachedToday"))
+                if m.get("isNpc"):
+                    breached = False
+                copy = dict(m)
+                if breached:
+                    copy["forfeitedXp"] = int(copy.get("forfeitedXp") or copy.get("forfeited") or 0) + stake
+                    losers.append(copy)
+                else:
+                    winners.append(copy)
+                members.append(copy)
+
+            share_xp = 0
+            if losers and winners:
+                share_xp = int((len(losers) * stake) / len(winners))
+                s = get_settings()
+                for w in winners:
+                    w["wonXp"] = int(w.get("wonXp") or w.get("won") or 0) + share_xp
+                    if not w.get("isNpc") and w.get("uid"):
+                        winner_uid = w["uid"]
+                        prof = data["profiles"].get(winner_uid) or {}
+                        if prof:
+                            new_xp = int(prof.get("xpPoints") or 0) + share_xp
+                            prof["xpPoints"] = new_xp
+                            prof["level"] = compute_level(new_xp, s.xp_per_level)
+                            data["profiles"][winner_uid] = prof
+                            eid = self._next_id(data, "xp")
+                            data["xp_events"][str(eid)] = {
+                                "id": eid,
+                                "userId": winner_uid,
+                                "eventType": "streak_pot_win",
+                                "xpAwarded": share_xp,
+                                "description": f"Won {share_xp} XP from Streak Pot 🏆",
+                                "createdAt": _now_iso(),
+                            }
+                members = winners + losers
+
+            pot = {
+                **pot,
+                "members": members,
+                "lastSettledAt": _now_iso(),
+                "settlement": {
+                    "losers": [x["displayName"] for x in losers],
+                    "winners": [x["displayName"] for x in winners],
+                    "shareXpEach": share_xp,
+                },
+            }
+            data["streak_pots"][key] = pot
+            return pot
+
+        return self._mutate(work)

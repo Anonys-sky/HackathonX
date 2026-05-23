@@ -105,3 +105,46 @@ export type ApiPlanBudgetResult = {
   usedFallback?: boolean;
   providerError?: string | null;
 };
+
+export type ApiStreakPotMember = {
+  uid: string;
+  displayName: string;
+  avatar: string;
+  isNpc?: boolean;
+  staked: boolean;
+  breachedToday?: boolean;
+  forfeitedXp?: number;
+  wonXp?: number;
+  /** @deprecated legacy field */
+  forfeited?: number;
+  won?: number;
+};
+
+export type ApiStreakPot = {
+  id: number;
+  name: string;
+  weekKey: string;
+  stakeXp: number;
+  rewardType?: "xp";
+  potTotalXp: number;
+  members: ApiStreakPotMember[];
+  dailySafeLimit?: number;
+  todaySpent?: number;
+  /** @deprecated use stakeXp */
+  stakeAmount?: number;
+  potTotal?: number;
+  settlement?: {
+    losers: string[];
+    winners: string[];
+    shareXpEach: number;
+    /** @deprecated */
+    shareEach?: number;
+  };
+};
+
+export type ApiStreakPotCheckIn = {
+  pot: ApiStreakPot;
+  breached: boolean;
+  dailySafeLimit: number;
+  todaySpent: number;
+};

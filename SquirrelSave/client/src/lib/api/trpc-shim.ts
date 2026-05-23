@@ -21,6 +21,8 @@ import type {
   ApiWallet,
   ApiXpEvent,
   ApiXpMutation,
+  ApiStreakPot,
+  ApiStreakPotCheckIn,
 } from "./types";
 
 type QueryOpts<T> = Omit<UseQueryOptions<T, Error>, "queryKey" | "queryFn">;
@@ -63,6 +65,7 @@ export const trpc = {
       },
       goals: { list: { invalidate: () => qc.invalidateQueries({ queryKey: ["goals"] }) } },
       streaks: { list: { invalidate: () => qc.invalidateQueries({ queryKey: ["streaks"] }) } },
+      streakPots: { list: { invalidate: () => qc.invalidateQueries({ queryKey: ["streakPots"] }) } },
       gamification: {
         xpHistory: { invalidate: () => qc.invalidateQueries({ queryKey: ["gamification", "xp"] }) },
       },
@@ -165,6 +168,25 @@ export const trpc = {
     addFunds: {
       useMutation: (opts?: UseMutationOptions<ApiXpMutation, Error, { goalId: number; amount: number }>) =>
         useApiMutation(({ goalId, amount }) => apiClient.goals.addFunds(goalId, amount), opts),
+    },
+  },
+
+  streakPots: {
+    list: {
+      useQuery: (_input?: void, opts?: QueryOpts<ApiStreakPot[]>) =>
+        useApiQuery(["streakPots"], () => apiClient.streakPots.list(), opts),
+    },
+    create: {
+      useMutation: (opts?: UseMutationOptions<ApiStreakPot, Error, { stakeXp: number }>) =>
+        useApiMutation((v) => apiClient.streakPots.create(v), opts),
+    },
+    checkIn: {
+      useMutation: (opts?: UseMutationOptions<ApiStreakPotCheckIn, Error, { potId: number }>) =>
+        useApiMutation(({ potId }) => apiClient.streakPots.checkIn(potId), opts),
+    },
+    settle: {
+      useMutation: (opts?: UseMutationOptions<ApiStreakPot, Error, { potId: number }>) =>
+        useApiMutation(({ potId }) => apiClient.streakPots.settle(potId), opts),
     },
   },
 

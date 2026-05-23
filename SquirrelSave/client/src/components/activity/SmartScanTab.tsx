@@ -1,13 +1,14 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { trpc } from "@/lib/trpc";
+import { parseBankText } from "@shared/parseBankText";
 import { useTransactionCacheInvalidation } from "@/hooks/useTransactionCache";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Zap, AlertCircle, Loader2, Camera, FileText, ImagePlus } from "lucide-react";
+import { Zap, AlertCircle, Loader2, Camera, FileText, ImagePlus, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { extractTextFromImage } from "@/lib/receiptOcr";
 import { ACTIVITY_CATEGORIES } from "./constants";
@@ -41,17 +42,7 @@ export function SmartScanTab({ t }: { t: (key: string) => string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const invalidateTx = useTransactionCacheInvalidation();
 
-  const parseMutation = trpc.transactions.parseRaw.useMutation({
-    onSuccess: (data) => {
-      setParsed(data.transactions as ParsedTx[]);
-      setSelected(new Set(data.transactions.map((_: unknown, i: number) => i)));
-      toast.success(`${data.transactions.length} ${t("activity.parsed_count")}`);
-    },
-    onError: () => {
-      if (!rawText.trim()) return;
-      toast.error(t("activity.parser_try_again"));
-    },
-  });
+  const [isParsing, setIsParsing] = useState(false);
 
   const addMutation = trpc.transactions.add.useMutation({
     onSuccess: invalidateTx,
@@ -84,6 +75,25 @@ export function SmartScanTab({ t }: { t: (key: string) => string }) {
     }
   }
 
+  function handleParseLocal() {
+    if (!rawText.trim()) return;
+    setIsParsing(true);
+    try {
+      const { transactions } = parseBankText(rawText);
+      if (!transactions.length) {
+        toast.error(t("activity.parser_try_again"));
+        return;
+      }
+      setParsed(transactions as ParsedTx[]);
+      setSelected(new Set(transactions.map((_, i) => i)));
+      toast.success(`${transactions.length} ${t("activity.parsed_count")}`);
+    } catch {
+      toast.error(t("activity.parser_try_again"));
+    } finally {
+      setIsParsing(false);
+    }
+  }
+
   async function handleSaveSelected() {
     const toSave = parsed.filter((_, i) => selected.has(i));
     let saved = 0;
@@ -110,7 +120,7 @@ export function SmartScanTab({ t }: { t: (key: string) => string }) {
     clearPreview();
   }
 
-  const busy = parseMutation.isPending || isOcrRunning;
+  const busy = isParsing || isOcrRunning;
 
   return (
     <div className="space-y-4 pb-8">
@@ -120,6 +130,10 @@ export function SmartScanTab({ t }: { t: (key: string) => string }) {
           <p className="text-sm font-bold text-foreground">{t("activity.smart_scan_title")}</p>
         </div>
         <p className="text-xs text-muted-foreground leading-relaxed">{t("activity.smart_scan_desc")}</p>
+        <p className="text-[10px] font-semibold text-[oklch(0.4_0.12_160)] mt-2 flex items-center gap-1">
+          <Shield size={12} />
+          {t("activity.zero_trust_badge")}
+        </p>
       </div>
 
       <div className="flex rounded-2xl bg-muted p-1">
@@ -242,11 +256,11 @@ export function SmartScanTab({ t }: { t: (key: string) => string }) {
       </div>
 
       <Button
-        onClick={() => parseMutation.mutate({ rawText })}
+        onClick={handleParseLocal}
         disabled={!rawText.trim() || busy}
         className="w-full rounded-2xl h-12 font-semibold gap-2"
       >
-        {parseMutation.isPending ? (
+        {isParsing ? (
           <>
             <Loader2 size={16} className="animate-spin" /> {t("activity.parsing")}
           </>

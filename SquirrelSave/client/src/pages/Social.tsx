@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { SOCIAL } from "@shared/config";
 import { BadgesSheet } from "@/components/social/BadgesSheet";
 import { LeagueLeaderboard, type LeagueRow } from "@/components/social/LeagueLeaderboard";
+import { StreakPotCard } from "@/components/social/StreakPotCard";
 import { CAMPUS_LEAGUE } from "@/components/social/campusLeague";
 
 const AVATARS = SOCIAL.friendAvatars;
@@ -142,6 +143,8 @@ export default function Social() {
         </header>
 
         <div className="px-4 mt-2">
+          <StreakPotCard t={t} />
+
           <div className="flex rounded-2xl bg-muted p-1 mb-4">
             <button
               type="button"

@@ -124,6 +124,10 @@ class ParseRaw(BaseModel):
     rawText: str
 
 
+class StreakPotCreate(BaseModel):
+    stakeXp: int = Field(default=50, gt=0, le=500)
+
+
 # ── Auth ─────────────────────────────────────────────────────────────────────
 
 
@@ -475,6 +479,79 @@ def goals_add_funds(goal_id: int, amount: float, user: dict = Depends(get_curren
     store.update_profile(uid, {"xpPoints": new_xp, "level": compute_level(new_xp, s.xp_per_level)})
     store.create_xp_event(uid, "saved_to_goal", xp, f"Added to goal: {updated['name']}")
     return {"success": True, "currentAmount": new_amt, "xpAwarded": xp}
+
+
+# ── Streak pots (simulated staking) ────────────────────────────────────────────
+
+
+@app.get("/api/streak-pots")
+def streak_pots_list(user: dict = Depends(get_current_user)):
+    from app.services import streak_pot as sp
+
+    uid = user_uid(user)
+    store = get_store()
+    pots = store.list_streak_pots(uid)
+    out = []
+    for pot in pots:
+        updated = sp.evaluate_pot_for_user(uid, pot)
+        store.update_streak_pot(int(pot["id"]), {"members": updated["members"]})
+        updated["dailySafeLimit"] = sp.compute_daily_safe_limit(uid)
+        updated["todaySpent"] = sp.today_expense_total(uid)
+        out.append(updated)
+    return out
+
+
+@app.post("/api/streak-pots")
+def streak_pots_create(body: StreakPotCreate, user: dict = Depends(get_current_user)):
+    from app.services.streak_pot import evaluate_pot_for_user
+
+    uid = user_uid(user)
+    store = get_store()
+    display = user.get("name") or "You"
+    pot = store.create_streak_pot(uid, display, body.stakeXp)
+    updated = evaluate_pot_for_user(uid, pot)
+    store.update_streak_pot(int(pot["id"]), {"members": updated["members"]})
+    return updated
+
+
+@app.post("/api/streak-pots/{pot_id}/check-in")
+def streak_pots_check_in(pot_id: int, user: dict = Depends(get_current_user)):
+    from app.services.streak_pot import (
+        compute_daily_safe_limit,
+        evaluate_pot_for_user,
+        today_expense_total,
+        user_breached_today,
+    )
+
+    uid = user_uid(user)
+    store = get_store()
+    pot = store.get_streak_pot(pot_id)
+    if not pot or not any(m.get("uid") == uid for m in pot.get("members", [])):
+        raise HTTPException(404, "Pot not found")
+    updated = evaluate_pot_for_user(uid, pot)
+    store.update_streak_pot(pot_id, {"members": updated["members"]})
+    return {
+        "pot": updated,
+        "breached": user_breached_today(uid),
+        "dailySafeLimit": compute_daily_safe_limit(uid),
+        "todaySpent": today_expense_total(uid),
+    }
+
+
+@app.post("/api/streak-pots/{pot_id}/settle")
+def streak_pots_settle(pot_id: int, user: dict = Depends(get_current_user)):
+    uid = user_uid(user)
+    store = get_store()
+    pot = store.get_streak_pot(pot_id)
+    if not pot or not any(m.get("uid") == uid for m in pot.get("members", [])):
+        raise HTTPException(404, "Pot not found")
+    from app.services.streak_pot import evaluate_pot_for_user
+
+    evaluate_pot_for_user(uid, pot)
+    settled = store.settle_streak_pot(pot_id, uid)
+    if not settled:
+        raise HTTPException(404, "Pot not found")
+    return settled
 
 
 # ── Streaks ──────────────────────────────────────────────────────────────────

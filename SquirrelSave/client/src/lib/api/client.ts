@@ -10,6 +10,8 @@ import type {
   ApiWallet,
   ApiXpEvent,
   ApiXpMutation,
+  ApiStreakPot,
+  ApiStreakPotCheckIn,
 } from "./types";
 
 const configuredBase = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
@@ -169,6 +171,15 @@ export const apiClient = {
       request(`/api/goals/${goalId}`, { method: "DELETE" }),
     addFunds: (goalId: number, amount: number) =>
       request<ApiXpMutation>(`/api/goals/${goalId}/add-funds?amount=${amount}`, { method: "POST" }),
+  },
+  streakPots: {
+    list: () => request<ApiStreakPot[]>("/api/streak-pots"),
+    create: (body: { stakeXp: number }) =>
+      request<ApiStreakPot>("/api/streak-pots", { method: "POST", body: JSON.stringify(body) }),
+    checkIn: (potId: number) =>
+      request<ApiStreakPotCheckIn>(`/api/streak-pots/${potId}/check-in`, { method: "POST" }),
+    settle: (potId: number) =>
+      request<ApiStreakPot>(`/api/streak-pots/${potId}/settle`, { method: "POST" }),
   },
   streaks: {
     list: () => request<ApiStreak[]>("/api/streaks"),

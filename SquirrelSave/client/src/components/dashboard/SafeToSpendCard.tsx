@@ -7,12 +7,15 @@ export function SafeToSpendCard({
   label,
   daysLeft,
   daysLeftLabel,
+  baseAmount,
 }: {
   amount: number;
   currency: string;
   label: string;
   daysLeft: number;
   daysLeftLabel: string;
+  /** Shown struck-through when context lowered the daily limit */
+  baseAmount?: number;
 }) {
   return (
     <section
@@ -25,7 +28,12 @@ export function SafeToSpendCard({
       >
         {label}
       </p>
-      <p className="text-4xl sm:text-[2.75rem] font-display text-primary mt-2 leading-none tabular-nums tracking-tight">
+      {baseAmount != null && baseAmount > amount + 0.5 && (
+        <p className="text-sm text-muted-foreground line-through mt-1 tabular-nums">
+          {formatCurrency(baseAmount, currency)}
+        </p>
+      )}
+      <p className="text-4xl sm:text-[2.75rem] font-display text-primary mt-1 leading-none tabular-nums tracking-tight">
         {formatCurrency(amount, currency)}
       </p>
       <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
