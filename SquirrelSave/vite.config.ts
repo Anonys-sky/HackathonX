@@ -33,13 +33,18 @@ export default defineConfig(({ mode }) => {
   envDir: projectRoot,
   root: path.resolve(projectRoot, "client"),
   publicDir: path.resolve(import.meta.dirname, "client", "public"),
+  optimizeDeps: {
+    include: ["@trpc/client", "@trpc/react-query", "@trpc/server"],
+  },
   build: {
     outDir: path.resolve(projectRoot, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      external: (id) =>
-        id.includes("/server/") || id.includes("\\server\\") || id === "mysql2",
+    commonjsOptions: {
+      include: [/node_modules/],
     },
+  },
+  ssr: {
+    noExternal: ["@trpc/server", "@trpc/client", "@trpc/react-query"],
   },
   server: {
     host: true,
