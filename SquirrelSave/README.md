@@ -8,7 +8,7 @@ Built for **HackathonX** — mobile-first **PWA** with **Continue without login*
 
 ## The problem
 
-*Aligned with our pitch deck — a real problem most **young adults in Malaysia** face today.*
+Most **young adults in Malaysia** struggle with money not because they never earn enough, but because spending is scattered, invisible until it’s too late, and finance apps make them feel worse instead of better.
 
 ### The avoidance cycle
 
@@ -46,7 +46,7 @@ Small daily spends (Grab, TnG, Shopee, bubble tea) keep going; the shock only co
 
 SquirryCoach is a **gamified AI-powered** personal finance **PWA** for **students and young adults in Malaysia**, focused on **Saving · Spending · Budgeting** in **ringgit**, with a friendly squirrel coach.
 
-| Problem (from deck) | SquirryCoach answer |
+| Problem | SquirryCoach answer |
 |---------------------|---------------------|
 | Too many banks & e-wallets | **Smart Scan** — paste alerts or **OCR** a screenshot; one feed in **Activity** (parsed on your phone) |
 | Manual tracking | **Manual log** (numpad + categories) + scan-first flow; no ledger homework |
