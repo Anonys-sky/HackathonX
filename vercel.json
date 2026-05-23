@@ -1,0 +1,5 @@
+{
+  "installCommand": "cd SquirrelSave && npm install --legacy-peer-deps",
+  "buildCommand": "cd SquirrelSave && npm run build",
+  "outputDirectory": "SquirrelSave/dist/public"
+}

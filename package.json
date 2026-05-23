@@ -1,0 +1,10 @@
+{
+  "name": "hackathonx",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix SquirrelSave",
+    "dev": "npm run dev --prefix SquirrelSave",
+    "check": "npm run check --prefix SquirrelSave",
+    "test": "npm run test --prefix SquirrelSave"
+  }
+}
