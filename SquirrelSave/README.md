@@ -8,74 +8,93 @@ Built for **HackathonX** — mobile-first **PWA** with **Continue without login*
 
 ## The problem
 
-Young adults in Malaysia often hit mid-month with little left in the bank, avoid checking balances, and lose track of small daily spends (Grab, TnG, Shopee). Most finance apps feel like homework: manual entry, charts in percentages, and no plain answer to **“how much can I spend today?”**
+*Aligned with our pitch deck — a real problem most **young adults in Malaysia** face today.*
+
+### The avoidance cycle
+
+Many students don’t run out of money on day one — they run out **mid-month**:
+
+1. **Money runs low** — allowance, part-time pay, or PTPTN doesn’t stretch to month-end.
+2. **The banking app hurts** — opening it shows something like **RM 12.50** left and a falling balance.
+3. **They stop looking** — low balance feels worse, so they **avoid checking** and hope it sorts itself out.
+
+Small daily spends (Grab, TnG, Shopee, bubble tea) keep going; the shock only comes later.
+
+### Four pains we hear (emotional)
+
+| Pain | What it means |
+|------|----------------|
+| **No idea how to budget** | They don’t know how to plan money across the month in plain RM. |
+| **Spend without knowing where it goes** | Small expenses add up; they only notice when it’s too late. |
+| **Don’t know how to save wisely** | They want to save but don’t know how much, where, or how to start. |
+| **Wallet empty before month-end** | Money is gone early; they survive until the next allowance or PTPTN. |
+
+### Four complications (why apps fail them)
+
+| # | Complication | What happens |
+|---|--------------|--------------|
+| **01** | **Too many banks & e-wallets** | Finances spread across Maybank, Touch ’n Go, Boost, GrabPay, etc. — no single view. |
+| **02** | **Manual tracking** | Recording and calculating every spend feels like homework. |
+| **03** | **Poor categorisation** | Bank labels (“Transport? Shopping? Others?”) don’t match real student life. |
+| **04** | **Saving alone feels lonely** | No motivation or accountability — easy to quit. |
+
+**What they need:** a **smarter, kinder, and more motivating** way to manage money and build habits — not another scary spreadsheet.
+
+---
 
 ## Our solution
 
-| Pain | SquirryCoach answer |
-|------|---------------------|
-| Messy bank / e-wallet alerts | **Smart Scan** — paste text or **photo OCR** (Tesseract.js in browser) |
-| Lazy to fill budget forms | **Wealth → Budget** — chat with Squirry; daily sheet fills in RM by category |
-| Easy to forget saving | **XP, levels, streaks**, and a **League** ranked by discipline (not wealth) |
-| “How much can I spend?” | **Safe to Spend Today** — spending wallet remaining ÷ days left in month |
-| Need a nudge | **Squirry coach** — overspend alerts + tips (LLM when configured, smart local fallback otherwise) |
+SquirryCoach is a **gamified AI-powered** personal finance **PWA** for **students and young adults in Malaysia**, focused on **Saving · Spending · Budgeting** in **ringgit**, with a friendly squirrel coach.
+
+| Problem (from deck) | SquirryCoach answer |
+|---------------------|---------------------|
+| Too many banks & e-wallets | **Smart Scan** — paste alerts or **OCR** a screenshot; one feed in **Activity** (parsed on your phone) |
+| Manual tracking | **Manual log** (numpad + categories) + scan-first flow; no ledger homework |
+| Poor categorisation | **Keyword rules** on-device + optional LLM; Malaysian merchants (Grab, TnG, etc.) |
+| Saving alone feels lonely | **League** (streak rank, not richest user) + **Streak Pot** (wager **XP**, not real money) |
+| Don’t know how to budget | **Wealth → Budget** — chat fills daily categories in RM; **50/30/20** onboarding |
+| “How much can I spend today?” | **Safe to Spend Today** — spending wallets ÷ days left in month |
+| Avoid checking / need motivation | **Squirry nudge** on Dashboard — budget tips + rain/exam context; dismiss ×, **tap squirrel to reopen** |
+| Want kinder guidance | Coach tone + XP/levels; works with **`LLM_LOCAL_ONLY=true`** when no API credits |
 
 ---
 
 ## How it works
 
 ```
-User input          Processing                         Output
-──────────          ──────────                         ──────
-Manual log          On-device rules (browser)          Safe to Spend Today (RM)
-Smart Scan (OCR     Weather + exam context             Context-adjusted daily limit
-  or paste SMS)     Optional LLM coach               Streak Pot (XP stakes)
-Onboarding          Budget math                        League, Goals, XP, alerts
-(50/30/20 split)
+┌─────────────────────────────────────────────────────────────────┐
+│  USER INPUT          PROCESSING              OUTPUT              │
+├─────────────────────────────────────────────────────────────────┤
+│  Manual log          On-device parse (rules)   Safe to Spend (RM) │
+│  Smart Scan OCR      Open-Meteo + exam rules   Adjusted daily cap │
+│  Onboarding 50/30/20 Optional LLM coach       Streak Pot (XP)    │
+│  Paste bank SMS      FastAPI + local JSON      League, Goals, XP  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Hackathon MVP innovations
+**Privacy-first scan:** Receipt images and pasted text are parsed in the **browser**. Only transactions you confirm are sent to the server.
 
-1. **Streak Pot (Anti-Budget)** — Social → wager **50 XP** with friends (Danial & Aiman demo). Stay under **Safe to Spend** or forfeit XP to winners. *Gamified accountability — no real money.*
-2. **Context engine** — Open-Meteo rain near **Gelugor** + exam-period buffer lowers today's Safe to Spend with Squirry nudges.
-3. **Zero-trust scan** — Tesseract OCR + `parseBankText` run **in the browser**; only confirmed rows are sent to the API.
+**Honest AI:** Set `LLM_LOCAL_ONLY=true` (default-friendly) for heuristic coach + budget replies. Add **Gemini / Groq** API keys to enable full LLM when credits are available.
 
-**Honest AI model:** Core flows work **without API keys**. Connect **Gemini / Groq** to enhance coach & budget chat when credits are available.
+### Hackathon differentiators
+
+1. **Streak Pot (Anti-Budget)** — Wager **50 XP** (not real money) with demo friends. Stay under **Safe to Spend** or forfeit XP to winners on weekly settle.
+2. **Context engine** — Rain near **Gelugor** (Open-Meteo) + **finals-week buffer** can lower today’s Safe to Spend; explained inside the **Squirry nudge** on Dashboard.
+3. **Zero-trust edge scan** — `shared/parseBankText.ts` + Tesseract.js; no receipt upload for parsing.
 
 ---
 
-## Features
+## Features by screen
 
-### Home & onboarding
-- **Continue without login** — instant demo guest for judges
-- **Onboarding** — monthly income (RM), wallet split with **50/30/20** recommendation
-
-### Dashboard
-- **Safe to Spend Today** — daily RM you can still spend (may be **lowered** for rain / exam buffer)
-- **Context banner** — predictive nudges (weather, finals week)
-- **Saving / Spending** progress donuts with **RM left** per allocation
-- **Monthly income** card, XP bar, streak, Squirry nudges
-- **Log Transaction** FAB → Activity
-
-### Activity
-- Date-grouped transaction feed
-- **Manual log** — numpad, merchant, required category chips
-- **Smart Scan** — paste bank/e-wallet text **or** receipt/screenshot **OCR** (client-side)
-
-### Wealth Coach
-- **Budget** — weekly calendar ribbon, daily summary card, WhatsApp-style **AI budget buddy** chat
-- **Progress** — level card, daily action checklist, XP history grouped by day
-- **Invest** — educational platform cards (Versa, StashAway, Wahed, Luno) with disclaimers
-
-### Social
-- **League** — leaderboard by **budget streak days** (friends + campus demo tab)
-- Badges sheet, add friend, poke/remind
-
-### Goals
-- Savings goals with progress and add funds
-
-### Other
-- **English & Bahasa Malaysia** (i18n)
+| Screen | Highlights |
+|--------|------------|
+| **Home** | Continue without login, EN / BM |
+| **Onboarding** | Monthly income (RM), wallet split with **50/30/20** tip |
+| **Dashboard** | Safe to Spend (context-adjusted), saving/spending donuts, XP bar, FAB → Activity, **Squirry nudge** (dismiss ×, tap mascot to reopen) |
+| **Activity** | Date-grouped feed, **Manual log** (numpad + categories), **Smart Scan** (OCR or paste, on-device parse) |
+| **Wealth** | **Budget** (weekly ribbon + AI chat), **Progress** (XP checklist), **Invest** (educational partners + disclaimer) |
+| **Social** | **Streak Pot** (XP stakes), **League** (streak rank), badges, add friend, poke |
+| **Goals** | Savings targets, add funds |
 
 ---
 
@@ -83,15 +102,14 @@ Onboarding          Budget math                        League, Goals, XP, alerts
 
 | Layer | Technology |
 |-------|------------|
-| **Frontend** | **React 19 + Vite** PWA (mobile-first; works in phone browser) |
-| **UI** | Tailwind CSS 4, shadcn/ui, Recharts, Framer Motion |
-| **API client** | REST (`/api/*`) + React Query (tRPC-compatible shim) |
-| **Backend** | **Python FastAPI** + Uvicorn |
-| **Data** | **Local JSON** (default, `DATA_BACKEND=local`) or **Firebase Firestore** (`DATA_BACKEND=firebase`) |
-| **Scan** | **Tesseract.js** (browser OCR) + heuristic text parser |
-| **Intelligence** | **Rules / heuristics** + optional **LLM** (Gemini/Groq/OpenAI-compatible) for coach & budget chat |
-| **Deploy** | Vercel (static PWA + Python serverless `/api`) or Railway/Render/Fly (full FastAPI + static) |
-| **Legacy (optional)** | Node + Express + tRPC + MySQL — `npm run dev:legacy` |
+| **Frontend** | React 19, Vite 7, Tailwind CSS 4, shadcn/ui, Recharts, Framer Motion |
+| **Mobile** | Mobile-first PWA (~430px layouts), works in phone browser |
+| **API** | REST `/api/*` + React Query (tRPC-compatible shim) |
+| **Backend** | Python 3.10+, FastAPI, Uvicorn |
+| **Data** | Local JSON (`DATA_BACKEND=local`, default) or Firebase Firestore |
+| **OCR** | Tesseract.js (client-only) |
+| **Intelligence** | Heuristic categorization + optional OpenAI-compatible LLM |
+| **Deploy** | Vercel (`vercel.json`: SPA + Python `/api`) or `npm start` (full stack) |
 
 ---
 
@@ -99,28 +117,27 @@ Onboarding          Budget math                        League, Goals, XP, alerts
 
 ### Prerequisites
 
-- **Node.js 18+** and **npm**
-- **Python 3.10+** with `pip`
+- **Node.js 18+**, **npm**
+- **Python 3.10+**, **pip**
 
-### Run locally
+### One-command dev
 
 ```bash
 cd SquirrelSave
 cp .env.example .env
-# Optional: LLM_API_KEY — or keep LLM_LOCAL_ONLY=true for offline coach/parser
 pip install -r backend/requirements.txt
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-This starts:
+| Service | URL |
+|---------|-----|
+| Web | http://localhost:3000 |
+| API | http://127.0.0.1:8000 |
 
-- **API** — http://127.0.0.1:8000 (FastAPI)
-- **Web** — http://localhost:3000 (Vite; proxies `/api` to the API)
+On **Home** → **Continue without login** → complete **Onboarding** or open **Dashboard**.
 
-On **Home**, tap **Continue without login**, then complete onboarding or open the dashboard.
-
-See [SETUP.md](./SETUP.md) for troubleshooting, Groq/Gemini keys, and Firestore setup.
+More help: [SETUP.md](./SETUP.md)
 
 ---
 
@@ -130,18 +147,15 @@ Copy `.env.example` → `.env`. Never commit secrets.
 
 | Variable | Purpose |
 |----------|---------|
-| `DATA_BACKEND` | `local` (JSON file) or `firebase` (Firestore) |
-| `DEMO_USER_ID` | Guest user id for judge/demo mode |
-| `LLM_API_URL` | OpenAI-compatible base URL (Gemini, Groq, etc.) |
-| `LLM_API_KEY` | API key for coach + budget planner |
-| `LLM_MODEL` | e.g. `gemini-2.0-flash` |
-| `LLM_FALLBACK_ENABLED` | `true` = heuristic/local replies when API fails |
-| `LLM_LOCAL_ONLY` | `true` = skip remote LLM (demo-friendly) |
-| `FIREBASE_PROJECT_ID` | Required when `DATA_BACKEND=firebase` |
-| `FIREBASE_SERVICE_ACCOUNT_JSON` | Service account JSON (one line) for Firestore |
-| `VITE_API_URL` | Production API origin (if frontend hosted separately) |
-| `VITE_APP_NAME` | Brand name in UI (default `SquirryCoach`) |
-| `DEFAULT_CURRENCY` | e.g. `RM` |
+| `DATA_BACKEND` | `local` (JSON) or `firebase` |
+| `DEMO_USER_ID` | Guest user for judge/demo mode |
+| `LLM_API_URL` / `LLM_API_KEY` / `LLM_MODEL` | Gemini, Groq, or OpenAI-compatible |
+| `LLM_FALLBACK_ENABLED` | `true` = local replies when API fails |
+| `LLM_LOCAL_ONLY` | `true` = no remote LLM (recommended for demos) |
+| `FIREBASE_*` | When using Firestore |
+| `VITE_API_URL` | Production API URL if frontend is separate |
+| `VITE_APP_NAME` | Brand in UI (default `SquirryCoach`) |
+| `DEFAULT_CURRENCY` | `RM` |
 
 ---
 
@@ -149,21 +163,26 @@ Copy `.env.example` → `.env`. Never commit secrets.
 
 ```
 SquirrelSave/
-├── api/                      # Vercel serverless entry (wraps FastAPI)
+├── api/index.py              # Vercel serverless → FastAPI
 ├── backend/
-│   ├── app/main.py           # FastAPI routes
-│   ├── app/store/            # local JSON + Firestore adapters
-│   └── app/services/         # LLM, heuristics, gamification, spending
+│   ├── app/main.py           # REST routes
+│   ├── app/store/            # local JSON + Firestore
+│   ├── app/services/         # LLM, streak_pot, spending, heuristics
+│   └── tests/                # pytest integration tests
 ├── client/src/
 │   ├── pages/                # Home, Dashboard, Activity, Social, Wealth, Goals
-│   ├── components/           # dashboard/, activity/, social/, wealth/
+│   ├── components/           # dashboard/, activity/, social/, wealth/, SquirryNudgeBubble
 │   └── lib/
 │       ├── api/              # REST client + React Query shim
-│       ├── receiptOcr.ts     # Tesseract.js wrapper
-│       └── budgetCycle.ts    # Safe to spend, wallet math
-├── shared/                   # Config, budget planner categories, coach nudges
-├── server/                   # Legacy Node/tRPC (optional)
-└── dist/public/              # Vite production build
+│       ├── contextEngine.ts  # Weather + exam → Safe to Spend
+│       ├── receiptOcr.ts     # Tesseract wrapper
+│       └── budgetCycle.ts    # Safe to spend math
+├── shared/
+│   ├── parseBankText.ts      # On-device transaction parser
+│   ├── contextRules.ts       # Exam periods, campus coords
+│   └── coachNudges.ts        # Squirry bubble copy logic
+├── vercel.json
+└── dist/public/              # Production build output
 ```
 
 ---
@@ -171,38 +190,32 @@ SquirrelSave/
 ## Development
 
 ```bash
-npm run dev          # FastAPI :8000 + Vite :3000 (recommended)
-npm run dev:legacy   # Old Node + MySQL stack
+npm run dev          # FastAPI :8000 + Vite :3000
 npm run check        # TypeScript
-npm test             # Vitest
-npm run test:api     # pytest (backend)
-npm run build        # Production client bundle
-npm start            # Uvicorn serves API + static dist
+npm run test         # Vitest (shared + legacy routers)
+npm run test:api     # pytest (11 integration tests)
+npm run test:all     # Both
+npm run build        # Production client → dist/public
+npm start            # Serve API + static dist
 ```
 
-### Adding a feature
-
-1. **API** — route in `backend/app/main.py`, persistence in `backend/app/store/`
-2. **Client** — `client/src/lib/api/client.ts` and `trpc-shim.ts`
-3. **UI** — `client/src/pages/` and `client/src/components/`
-
-Demo mode sends `X-Demo-Mode: true` and uses `DEMO_USER_ID` — no Firebase Auth required for judges.
+Demo requests send `X-Demo-Mode: true` and use `DEMO_USER_ID` — no Firebase Auth required.
 
 ---
 
-## Demo flow (for judges)
+## Demo flow (judges — ~5 min)
 
 1. **Home** → **Continue without login**
-2. **Onboarding** — income + wallet split (or skip if already complete)
-3. **Dashboard** — note **Safe to Spend Today** and Saving/Spending donuts (RM)
-4. **Activity** → **Smart Scan** — paste sample TnG/Grab text or upload a receipt image
-5. **Activity** → **Manual log** — amount + category in three taps
-6. **Wealth → Budget** — “Plan my budget for today” → Squirry fills daily categories
-7. **Social → Streak Pot** — stake 50 XP, check in, settle week (winners earn XP)
-8. **Social → League** — streak ranking (not account balance)
-9. **Goals** — create or view a savings target
+2. **Onboarding** — income + wallet split (or skip if profile exists)
+3. **Dashboard** — **Safe to Spend Today**, donuts, open **Squirry nudge** (context + budget tip); dismiss with ×, tap squirrel to reopen
+4. **Activity → Smart Scan** — paste sample text below or scan a receipt photo
+5. **Activity → Manual log** — amount + category
+6. **Wealth → Budget** — tap “Plan my budget for today”
+7. **Social → Streak Pot** — **Stake 50 XP**, **Check today**, **Settle week**
+8. **Social → League** — streak ranking (not wallet size)
+9. **Goals** — view or create a savings goal
 
-**Sample paste for Smart Scan:**
+**Sample Smart Scan paste:**
 
 ```
 TNG*SHP MYR 15.50
@@ -214,37 +227,47 @@ MBB PETRON 45.00
 
 ## Deployment
 
-### Vercel (this repo)
+### Vercel (`SquirrelSave/vercel.json`)
 
-`vercel.json` builds the PWA and routes `/api/*` to the Python function (`api/index.py`). SPA routes rewrite to `index.html`.
+- Builds PWA → `dist/public`
+- `/api/*` → Python function
+- SPA fallback → `index.html`
 
-```bash
-npm run build
-# Deploy from SquirrelSave/ (or monorepo root with root vercel.json)
-```
-
-### Full stack (Railway, Render, Fly.io)
+### Full stack (Railway / Render / Fly.io)
 
 ```bash
 npm run build
-npm start   # FastAPI serves dist/public + /api
+npm start
 ```
 
-Set `DATA_BACKEND=firebase` and Firestore credentials for persistent multi-user data in production.
+Use Firestore in production for multi-user persistence beyond local JSON.
 
 ---
 
-## Scripts
+## Known limitations 
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | FastAPI + Vite (recommended) |
-| `npm run dev:legacy` | Node + embedded MySQL |
-| `npm run test` | Vitest (client/shared) |
-| `npm run test:api` | pytest (backend) |
-| `npm run check` | `tsc --noEmit` |
-| `npm run build` | Build client for production |
-| `npm start` | Production API + static files |
+| Area | Status |
+|------|--------|
+| Real money / escrow | **Not implemented** — Streak Pot uses **XP only** |
+| Grab surge API | **Simulated** from rain + heuristics, not live Grab pricing |
+| Campus league | **Demo data** for showcase |
+| Invest “Explore” | Toast placeholder, not live deep links |
+| Auth | Demo guest only; Firebase Auth optional for production |
+| Exam calendar | Hard-coded demo periods in `shared/contextRules.ts` |
+
+---
+
+## Submission readiness
+
+| Check | Status |
+|-------|--------|
+| `npm run check` | Pass |
+| `npm run build` | Pass |
+| `npm run test` + `npm run test:api` | 26 + 11 tests pass |
+| Judge path (no login) | Works |
+| README matches codebase | Yes |
+| Slide stack aligned (React + FastAPI, not Flutter/Firebase-only) | Your slides should say this |
+
 
 ---
 
@@ -252,8 +275,4 @@ Set `DATA_BACKEND=firebase` and Firestore credentials for persistent multi-user 
 
 MIT — see [package.json](./package.json).
 
----
-
 **SquirryCoach** — finance that feels like texting a friend, not doing accounting.
-
-Setup help → [SETUP.md](./SETUP.md).

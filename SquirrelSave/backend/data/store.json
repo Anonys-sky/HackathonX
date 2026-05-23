@@ -6,7 +6,7 @@
     "goal": 0,
     "streak": 1,
     "xp": 13,
-    "chat": 22,
+    "chat": 36,
     "streak_pot": 1
   },
   "users": {
@@ -19,7 +19,7 @@
       "role": "user",
       "createdAt": "2026-05-23T09:51:55.637227+00:00",
       "updatedAt": "2026-05-23T09:51:55.637227+00:00",
-      "lastSignedIn": "2026-05-23T14:35:27.931352+00:00"
+      "lastSignedIn": "2026-05-23T14:52:50.696506+00:00"
     }
   },
   "profiles": {
@@ -28,7 +28,7 @@
       "currency": "RM",
       "onboardingComplete": true,
       "userId": "guest-demo-judge",
-      "updatedAt": "2026-05-23T14:34:32.308583+00:00",
+      "updatedAt": "2026-05-23T14:44:16.244228+00:00",
       "createdAt": "2026-05-23T10:58:46.758024+00:00",
       "xpPoints": 355,
       "level": 1,
@@ -457,6 +457,104 @@
       "role": "assistant",
       "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
       "createdAt": "2026-05-23T14:35:27.987769+00:00"
+    },
+    "23": {
+      "id": 23,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Food RM25, groceries RM100",
+      "createdAt": "2026-05-23T14:52:06.977480+00:00"
+    },
+    "24": {
+      "id": 24,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM148 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:07.003646+00:00"
+    },
+    "25": {
+      "id": 25,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "reduce transport by rm11",
+      "createdAt": "2026-05-23T14:52:27.756685+00:00"
+    },
+    "26": {
+      "id": 26,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:27.777980+00:00"
+    },
+    "27": {
+      "id": 27,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Food RM25, groceries RM100",
+      "createdAt": "2026-05-23T14:52:40.542696+00:00"
+    },
+    "28": {
+      "id": 28,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:40.560778+00:00"
+    },
+    "29": {
+      "id": 29,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Plan my budget for today",
+      "createdAt": "2026-05-23T14:52:41.756464+00:00"
+    },
+    "30": {
+      "id": 30,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:41.779995+00:00"
+    },
+    "31": {
+      "id": 31,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Cheap day, help me save",
+      "createdAt": "2026-05-23T14:52:43.441721+00:00"
+    },
+    "32": {
+      "id": 32,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:43.458008+00:00"
+    },
+    "33": {
+      "id": 33,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Food RM25, groceries RM100",
+      "createdAt": "2026-05-23T14:52:46.613053+00:00"
+    },
+    "34": {
+      "id": 34,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM149 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:46.634078+00:00"
+    },
+    "35": {
+      "id": 35,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Plan my budget for today",
+      "createdAt": "2026-05-23T14:52:48.231685+00:00"
+    },
+    "36": {
+      "id": 36,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM149 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T14:52:48.250228+00:00"
     }
   },
   "streak_pots": {
