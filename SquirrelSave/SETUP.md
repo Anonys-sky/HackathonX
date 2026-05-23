@@ -1,49 +1,69 @@
-# SquirryCoach — local setup (done for you)
+# SquirryCoach — local setup
 
 ## Start the app
 
 ```powershell
 cd c:\Users\User\HackathonX\SquirrelSave
+pip install -r backend/requirements.txt
+npm install --legacy-peer-deps
 npm run dev
 ```
 
-First run may take a few minutes while embedded MySQL downloads (one time).
+Open **http://localhost:3000** (Vite). API runs at **http://127.0.0.1:8000**; Vite proxies `/api` to it.
 
-Open the URL printed in the terminal (usually **http://localhost:3000** or **3001** if 3000 is busy).
-
-## No login required
-
-The app uses a single **guest user** automatically (hackathon mode). Open the app and go straight to onboarding or the dashboard.
+On **Home**, tap **Continue without login** to enter as the demo guest (no account).
 
 ## What was configured
 
 | Item | How |
 |------|-----|
-| **LLM** | OpenAI `gpt-4o-mini` via `.env` (auto **offline fallback** if quota fails) |
-| **Database** | Embedded MySQL (`AUTO_START_MYSQL=true`) — no Docker required |
-| **Auth** | None — shared guest user |
+| **API** | Python FastAPI (`backend/`) |
+| **Data** | Local JSON file by default (`backend/data/store.json`) — no MySQL required |
+| **LLM** | OpenAI `gpt-4o-mini` via `.env` + **offline fallback** if quota fails |
+| **Auth** | Demo guest (`DEMO_USER_ID`) — no sign-in for judges |
 | **Secrets** | `.env` only (gitignored) |
 
-## Optional: Docker MySQL instead
+## Optional: Firebase Firestore
 
-1. Install Docker Desktop  
-2. Set `AUTO_START_MYSQL=false` in `.env`  
-3. Run `docker compose up -d`  
-4. Use `DATABASE_URL=mysql://piggy:piggy_pass@localhost:3306/piggy_coach`
+```env
+DATA_BACKEND=firebase
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
+```
+
+## Optional: legacy Node + MySQL
+
+```powershell
+npm run dev:legacy
+```
+
+Requires `AUTO_START_MYSQL=true` or Docker MySQL — see `.env.example`.
 
 ## AI / LLM
 
-- **`LLM_FALLBACK_ENABLED=true`** (default in dev): coach chat and transaction parser still work when OpenAI returns 429 quota errors.
+- **`LLM_FALLBACK_ENABLED=true`** (default): coach chat and transaction parser work when OpenAI returns 429 quota errors.
 - **Full AI again**: Add billing at [platform.openai.com](https://platform.openai.com), or use **Groq** (free tier):
 
 ```env
-LLM_API_URL=https://api.groq.com/openai
+LLM_API_URL=https://api.groq.com/openai/v1
 LLM_API_KEY=gsk_your-groq-key
 LLM_MODEL=llama-3.1-8b-instant
 ```
 
+## Production
+
+```powershell
+npm run build
+npm start
+```
+
+Serves the SPA and API on port **8000**.
+
+For split hosting (e.g. Vercel frontend + Railway API), set `VITE_API_URL=https://your-api.example.com` before `npm run build`.
+
 ## Troubleshooting
 
-- **Port in use**: Stop old terminals or use the port shown in logs.  
-- **Stuck on first start**: Wait for `[MySQL] Migrations applied` and `Server running on...`  
-- **Coach 500 / quota**: Restart `npm run dev` after setting `LLM_FALLBACK_ENABLED=true` in `.env`
+- **Port in use**: Stop other terminals using 3000 or 8000.  
+- **`python` not found**: Install Python 3.10+ and re-run `pip install -r backend/requirements.txt`.  
+- **Coach 500 / quota**: Set `LLM_FALLBACK_ENABLED=true` in `.env` and restart `npm run dev`.  
+- **Empty profile after demo**: Complete onboarding once, or call `POST /api/auth/demo` from the Home button.

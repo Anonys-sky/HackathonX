@@ -64,18 +64,22 @@ export function BudgetPlannerView() {
         setAmounts((prev) => {
           const next = { ...prev };
           for (const c of data.categories) {
-            next[c.id] = c.amount;
+            const id = c.id as BudgetCategoryId;
+            next[id] = c.amount;
           }
           return next;
         });
         setPlans((prev) => {
-          const next = { ...prev, [key]: mergeAmounts(prev[key], data.categories) };
+          const mapped = data.categories.map((c) => ({
+            id: c.id as BudgetCategoryId,
+            amount: c.amount,
+          }));
+          const next = { ...prev, [key]: mergeAmounts(prev[key], mapped) };
           savePlans(next);
           return next;
         });
         toast.success(t("wealth.budget_filled"));
       }
-      if (data.usedFallback) toast.info(t("wealth.coach_fallback_hint"));
     },
     onError: (err) => {
       toast.error(err.message || t("common.error"));

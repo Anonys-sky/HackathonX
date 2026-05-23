@@ -47,7 +47,10 @@ export function AIParserTab({
         `${data.transactions.length} ${t("activity.parsed_count")} ${needsReview ? "🐿️" : "🤖"}`
       );
     },
-    onError: (err) => toast.error(err.message || t("common.error")),
+    onError: () => {
+      if (!rawText.trim()) return;
+      toast.error(t("activity.parser_try_again"));
+    },
   });
 
   const addMutation = trpc.transactions.add.useMutation({

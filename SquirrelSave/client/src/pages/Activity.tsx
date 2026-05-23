@@ -188,10 +188,12 @@ export default function Activity() {
                               {cat ? t(cat.labelKey) : tx.category}
                             </span>
                             <span className="text-[10px] text-muted-foreground">
-                              {new Date(tx.transactedAt).toLocaleDateString("en-MY", {
-                                day: "numeric",
-                                month: "short",
-                              })}
+                              {tx.transactedAt
+                                ? new Date(tx.transactedAt).toLocaleDateString("en-MY", {
+                                    day: "numeric",
+                                    month: "short",
+                                  })
+                                : ""}
                             </span>
                           </div>
                         </div>

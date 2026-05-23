@@ -48,7 +48,14 @@ export default defineConfig(({ mode }) => {
   },
   server: {
     host: true,
+    port: 3000,
     allowedHosts: ["localhost", "127.0.0.1"],
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],

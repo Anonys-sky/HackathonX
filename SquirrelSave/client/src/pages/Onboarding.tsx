@@ -9,7 +9,6 @@ import { SquirryMascot } from "@/components/SquirryMascot";
 import { useTranslation } from "@/hooks/useTranslation";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { TRPCClientError } from "@trpc/client";
 import { ChevronRight, ChevronLeft, Wallet, Coins, Shield, Sparkles, RotateCcw } from "lucide-react";
 import {
   DEFAULT_WALLET_ALLOCATIONS,
@@ -114,12 +113,7 @@ export default function Onboarding() {
       navigate("/dashboard");
     } catch (err) {
       console.error("[Onboarding]", err);
-      const message =
-        err instanceof TRPCClientError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : t("common.error");
+      const message = err instanceof Error ? err.message : t("common.error");
       toast.error(message || t("common.error"));
     }
   }

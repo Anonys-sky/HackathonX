@@ -9,12 +9,19 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { BRAND_NAME } from "@shared/brand";
+import { apiClient } from "@/lib/api/client";
 
 export default function Home() {
   const [, navigate] = useLocation();
   const { t } = useTranslation();
   const { language, setLanguage } = useLanguage();
   const profileQuery = trpc.profile.get.useQuery();
+
+  async function continueWithoutLogin() {
+    await apiClient.auth.demo();
+    const profile = await apiClient.profile.get();
+    navigate(profile?.onboardingComplete ? "/dashboard" : "/onboard");
+  }
 
   if (profileQuery.isSuccess) {
     navigate(profileQuery.data?.onboardingComplete ? "/dashboard" : "/onboard");
@@ -210,11 +217,21 @@ export default function Home() {
           <h2 className="text-2xl font-display text-foreground mt-4 mb-2">{t("home.ready")}</h2>
           <p className="text-sm text-muted-foreground mb-4">{t("home.join")}</p>
           <Button
-            onClick={() => navigate("/onboard")}
+            onClick={() => void continueWithoutLogin()}
             className="w-full h-14 rounded-2xl text-base font-bold bg-coral-gradient text-white shadow-lg"
           >
             {t("home.cta")}
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => void continueWithoutLogin()}
+            className="w-full h-12 rounded-2xl text-sm font-semibold mt-3 border-2"
+          >
+            Continue without login
+          </Button>
+          <p className="text-[10px] text-muted-foreground mt-2">
+            For judges & demos — no account required
+          </p>
         </div>
       </main>
     </div>

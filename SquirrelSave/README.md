@@ -2,7 +2,7 @@
 
 Gamified personal finance for students and young adults in Malaysia. Track spending in **ringgit**, build savings streaks, and let **Squirry** (your AI squirrel buddy) plan budgets, parse messy bank text, and nudge you before you overspend.
 
-Built for **HackathonX** — full-stack PWA with no login required for demos.
+Built for **HackathonX** — full-stack PWA with **Continue without login** for judges and demos.
 
 ---
 
@@ -24,6 +24,7 @@ Students know they should budget, but most apps feel like homework: manual entry
 
 ## Features
 
+- **Continue without login** — judges start instantly as a demo guest
 - **Onboarding** — custom wallet split with 50/30/20 recommendation  
 - **Dashboard** — Saving vs Spending allocation charts, search, daily date, Squirry nudges  
 - **Activity** — ledger + AI parser for bank/e-wallet paste  
@@ -39,11 +40,11 @@ Students know they should budget, but most apps feel like homework: manual entry
 | Layer | Technology |
 |-------|------------|
 | Frontend | React 19, Vite, Tailwind CSS 4, shadcn/ui, Recharts, Framer Motion |
-| API | tRPC + Superjson |
-| Backend | Express (Node), TypeScript |
-| Database | MySQL via Drizzle ORM |
+| API | REST (`/api/*`) via React Query shim (replaces tRPC client-side) |
+| Backend | **Python FastAPI** + Uvicorn |
+| Data | **Local JSON** (`DATA_BACKEND=local`, default) or **Firebase Firestore** |
 | AI | OpenAI-compatible API (`gpt-4o-mini` default) + **offline fallback** when quota fails |
-| Local dev | Embedded MySQL (`AUTO_START_MYSQL`) — no Docker required |
+| Legacy (optional) | Node + Express + tRPC + MySQL — `npm run dev:legacy` |
 
 ---
 
@@ -51,29 +52,28 @@ Students know they should budget, but most apps feel like homework: manual entry
 
 ### Prerequisites
 
-- Node.js 18+  
-- npm  
+- **Node.js 18+** and **npm**
+- **Python 3.10+** with `pip`
 
 ### Run locally
 
 ```bash
 cd SquirrelSave
 cp .env.example .env
-# Add your LLM_API_KEY (or rely on LLM_FALLBACK_ENABLED for demo)
+# Add LLM_API_KEY (or keep LLM_FALLBACK_ENABLED=true for demo)
+pip install -r backend/requirements.txt
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-Wait for:
+This starts:
 
-```
-[MySQL] Migrations applied
-✓ Server running — open http://localhost:3000/
-```
+- **API** — http://127.0.0.1:8000 (FastAPI)
+- **Web** — http://localhost:3000 (Vite; proxies `/api` to the API)
 
-Open the URL in your browser. A **guest user** is created automatically — no sign-in.
+On the **Home** screen, tap **Continue without login** (or complete onboarding as the demo guest).
 
-See [SETUP.md](./SETUP.md) for troubleshooting, Groq as a free LLM, and Docker MySQL.
+See [SETUP.md](./SETUP.md) for troubleshooting, Groq as a free LLM, and Firebase.
 
 ---
 
@@ -83,12 +83,14 @@ Copy `.env.example` → `.env`. Never commit secrets.
 
 | Variable | Purpose |
 |----------|---------|
+| `DATA_BACKEND` | `local` (JSON file) or `firebase` (Firestore) |
+| `DEMO_USER_ID` | Guest user id for judge/demo mode |
 | `LLM_API_URL` | OpenAI or compatible base URL |
 | `LLM_API_KEY` | API key for coach + parser |
 | `LLM_MODEL` | e.g. `gpt-4o-mini` |
 | `LLM_FALLBACK_ENABLED` | `true` = local coach/parser when API fails |
-| `AUTO_START_MYSQL` | `true` = embedded MySQL on first run |
-| `DATABASE_URL` | MySQL connection (optional if auto-start) |
+| `FIREBASE_PROJECT_ID` | Required when `DATA_BACKEND=firebase` |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Service account JSON (one line) for Firestore |
 | `VITE_APP_NAME` | Brand name in UI (default `SquirryCoach`) |
 | `DEFAULT_CURRENCY` | e.g. `RM` |
 
@@ -98,22 +100,17 @@ Copy `.env.example` → `.env`. Never commit secrets.
 
 ```
 SquirrelSave/
+├── backend/
+│   ├── app/main.py           # FastAPI routes
+│   ├── app/store/            # local JSON + Firestore adapters
+│   └── app/services/         # LLM, gamification, spending
 ├── client/src/
-│   ├── pages/              # Route screens (thin orchestration)
-│   ├── components/
-│   │   ├── activity/       # Parser, modals, skeleton
-│   │   ├── dashboard/      # Donut cards, skeleton
-│   │   └── …               # SquirryMascot, BudgetPlannerView, UI
-│   ├── hooks/              # useTransactionCache, useTranslation
-│   └── lib/                # trpc, currency, i18n
-├── server/
-│   ├── routers/            # tRPC by domain (auth, profile, transactions, coach, …)
-│   ├── routers.ts          # Re-exports appRouter
-│   ├── db.ts               # Drizzle queries
-│   └── lib/                # AI, spendingStats, walletContext
-├── shared/                 # Config, schemas, gamification, budget planner
-├── drizzle/                # Schema + SQL migrations
-└── server/_core/           # Express + Vite dev server bootstrap
+│   ├── pages/                # Route screens
+│   ├── components/           # UI, Squirry, activity, dashboard
+│   └── lib/api/              # REST client + tRPC-compatible hooks
+├── shared/                   # Config, schemas, gamification, budget planner
+├── server/                   # Legacy Node/tRPC (optional)
+└── dist/public/              # Vite build (served by FastAPI in production)
 ```
 
 ---
@@ -121,30 +118,38 @@ SquirrelSave/
 ## Development
 
 ```bash
-npm run dev        # Start app (port 3000 or next free)
-npm run check      # TypeScript
-npm test           # Vitest (routers, LLM fallback, budget planner)
-npm run build      # Production client + server bundle
+npm run dev          # FastAPI :8000 + Vite :3000
+npm run dev:legacy   # Old Node + MySQL stack
+npm run check        # TypeScript
+npm test             # Vitest (shared + legacy router tests)
+npm run build        # Production client bundle
+npm start            # Uvicorn serves API + static dist
 ```
 
 ### Adding a feature
 
-1. Schema — `drizzle/schema.ts` → apply SQL / `npm run db:push`  
-2. DB helpers — `server/db.ts`  
-3. tRPC procedures — `server/routers/<domain>.ts` (merged in `server/routers/index.ts`)  
-4. UI — `client/src/pages/` + `trpc.*` hooks  
+1. **API** — add route in `backend/app/main.py` and store methods in `backend/app/store/`
+2. **Client** — extend `client/src/lib/api/client.ts` and `trpc-shim.ts`
+3. **UI** — `client/src/pages/` + hooks
 
-Auth in hackathon mode: every request uses a shared guest user (`server/_core/guestUser.ts`). `protectedProcedure` does not require login.
+Demo mode sends `X-Demo-Mode: true` and uses `DEMO_USER_ID` — no Firebase Auth required for judges.
 
 ---
 
 ## Demo flow (for judges)
 
-1. **Home** → start onboarding or dashboard  
-2. **Dashboard** — Saving / Spending in RM; read Squirry nudge  
+1. **Home** → **Continue without login**  
+2. **Onboarding** or **Dashboard** — Saving / Spending in RM; read Squirry nudge  
 3. **Activity → AI Parser** — paste sample transaction text  
 4. **Wealth → Budget** — “Plan my budget for today” → Squirry fills amounts  
 5. **Goals / Social** — savings target + streaks  
+
+---
+
+## Deployment notes
+
+- **Full stack**: deploy FastAPI (`npm start` after `npm run build`) on Railway, Render, Fly.io, etc. The API serves the built SPA from `dist/public`.
+- **Vercel (frontend only)**: set `VITE_API_URL` to your hosted API origin; Vercel cannot run the Python API in the same project by default.
 
 ---
 
@@ -152,12 +157,12 @@ Auth in hackathon mode: every request uses a shared guest user (`server/_core/gu
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Dev server + Vite HMR |
-| `npm run dev:watch` | Dev with file watch on server |
+| `npm run dev` | FastAPI + Vite (recommended) |
+| `npm run dev:legacy` | Node + embedded MySQL |
 | `npm run test` | Unit tests |
 | `npm run check` | `tsc --noEmit` |
-| `npm run build` | Build for production |
-| `npm run db:up` | Docker MySQL (optional) |
+| `npm run build` | Build client for production |
+| `npm start` | Production API + static files |
 
 ---
 
@@ -166,8 +171,6 @@ Auth in hackathon mode: every request uses a shared guest user (`server/_core/gu
 MIT — see [package.json](./package.json).
 
 ---
-
-## Team / hackathon
 
 **SquirryCoach** — finance that feels like texting a friend, not doing accounting.
 

@@ -1,5 +1,15 @@
 {
-  "installCommand": "cd SquirrelSave && npm install --legacy-peer-deps",
+  "installCommand": "cd SquirrelSave && npm install --legacy-peer-deps && pip install -r api/requirements.txt",
   "buildCommand": "cd SquirrelSave && npm run build",
-  "outputDirectory": "SquirrelSave/dist/public"
+  "outputDirectory": "SquirrelSave/dist/public",
+  "functions": {
+    "SquirrelSave/api/index.py": {
+      "maxDuration": 30,
+      "includeFiles": "SquirrelSave/backend/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/SquirrelSave/api/index" },
+    { "source": "/api", "destination": "/SquirrelSave/api/index" }
+  ]
 }

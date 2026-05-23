@@ -136,7 +136,13 @@ export default function Dashboard() {
   const wallets = (stats?.wallets ?? []) as WalletRow[];
   const alerts = alertsQuery.data ?? [];
   const hasAlert = alerts.some((a) => a.isAlert);
-  const mood = (hasAlert ? "worried" : stats?.mascotMood) ?? ("happy" as MascotMood);
+  const mood: MascotMood = hasAlert
+    ? "worried"
+    : (["happy", "worried", "alert", "celebrating", "sleeping"] as const).includes(
+          stats?.mascotMood as MascotMood
+        )
+      ? (stats!.mascotMood as MascotMood)
+      : "happy";
   const spendingPercent = stats?.spendingPercent ?? 0;
   const xpToNext = stats?.xpToNextLevel ?? 500;
   const xpPoints = profile?.xpPoints ?? 0;
@@ -401,7 +407,9 @@ export default function Dashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-foreground truncate">{tx.merchantName}</p>
                       <p className="text-[10px] text-muted-foreground">
-                        {new Date(tx.transactedAt).toLocaleDateString()}
+                        {tx.transactedAt
+                          ? new Date(tx.transactedAt).toLocaleDateString()
+                          : ""}
                       </p>
                     </div>
                     <span
@@ -425,7 +433,8 @@ export default function Dashboard() {
       <SquirryNudgeBubble
         justUploadedTx={justUploadedTx}
         context={{
-          userName: user?.name?.split(" ")[0] ?? "Friend",
+          userName:
+            typeof user?.name === "string" ? user.name.split(" ")[0] : "Friend",
           currency,
           todayExpenseTotal: todayStats.expenseTotal,
           todayTxCount: todayStats.count,
