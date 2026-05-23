@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, type TargetAndTransition } from "framer-motion";
+import { motion, type TargetAndTransition } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export type MascotMood = "happy" | "worried" | "alert" | "celebrating" | "sleeping";
@@ -11,12 +11,12 @@ interface SquirryMascotProps {
   level?: number;
 }
 
-const moodConfig: Record<MascotMood, { animation: string; bgColor: string; label: string; emoji: string }> = {
-  happy: { animation: "squirry-bounce", bgColor: "oklch(0.92 0.08 60)", label: "Happy", emoji: "😊" },
-  worried: { animation: "squirry-wobble", bgColor: "oklch(0.92 0.1 85)", label: "Worried", emoji: "😟" },
-  alert: { animation: "", bgColor: "oklch(0.92 0.1 25)", label: "Alert", emoji: "😰" },
-  celebrating: { animation: "squirry-celebrate", bgColor: "oklch(0.92 0.1 160)", label: "Celebrating", emoji: "🎉" },
-  sleeping: { animation: "", bgColor: "oklch(0.92 0.03 260)", label: "Sleeping", emoji: "😴" },
+const moodConfig: Record<MascotMood, { bgColor: string; label: string }> = {
+  happy: { bgColor: "oklch(0.92 0.08 60)", label: "Happy" },
+  worried: { bgColor: "oklch(0.92 0.1 85)", label: "Worried" },
+  alert: { bgColor: "oklch(0.92 0.1 25)", label: "Alert" },
+  celebrating: { bgColor: "oklch(0.92 0.1 160)", label: "Celebrating" },
+  sleeping: { bgColor: "oklch(0.92 0.03 260)", label: "Sleeping" },
 };
 
 function SquirryFace({ mood, size }: { mood: MascotMood; size: number }) {
@@ -99,8 +99,6 @@ function SquirryFace({ mood, size }: { mood: MascotMood; size: number }) {
         <>
           <path d={`M ${eyeLX - eyeR} ${eyeY + eyeR * 0.15} Q ${eyeLX} ${eyeY - eyeR * 1.1} ${eyeLX + eyeR} ${eyeY + eyeR * 0.15}`} stroke={eyeColor} strokeWidth={r * 0.08} fill="none" strokeLinecap="round" />
           <path d={`M ${eyeRX - eyeR} ${eyeY + eyeR * 0.15} Q ${eyeRX} ${eyeY - eyeR * 1.1} ${eyeRX + eyeR} ${eyeY + eyeR * 0.15}`} stroke={eyeColor} strokeWidth={r * 0.08} fill="none" strokeLinecap="round" />
-          <text x={cx - r * 0.95} y={cy - r * 0.9} fontSize={r * 0.28} textAnchor="middle">✨</text>
-          <text x={cx + r * 0.95} y={cy - r * 0.9} fontSize={r * 0.28} textAnchor="middle">✨</text>
         </>
       ) : (
         <>
@@ -175,17 +173,6 @@ export function SquirryMascot({ mood = "happy", size = 120, className, level = 1
           {level}
         </div>
       )}
-      <AnimatePresence>
-        <motion.div
-          key={mood}
-          initial={{ opacity: 0, scale: 0.5, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.5 }}
-          className="absolute -top-2 -right-2 text-lg"
-        >
-          {config.emoji}
-        </motion.div>
-      </AnimatePresence>
     </div>
   );
 }
@@ -201,7 +188,7 @@ export function MoodBadge({ mood }: { mood: MascotMood }) {
   };
   return (
     <span className={cn("inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold", colorMap[mood])}>
-      {config.emoji} {config.label}
+      {config.label}
     </span>
   );
 }

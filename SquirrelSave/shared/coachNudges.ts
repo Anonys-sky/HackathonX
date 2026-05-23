@@ -33,6 +33,92 @@ export type CoachNudgeContext = {
   justUploadedTx: boolean;
 };
 
+/** Dashboard bubble: budget warnings and saving tips only (no streak spam). */
+export function pickDashboardCoachNudge(ctx: CoachNudgeContext): CoachNudge | null {
+  const name = ctx.userName || "there";
+  const params: Record<string, string | number> = {
+    name,
+    currency: ctx.currency,
+    amount: Math.round(ctx.todayExpenseTotal),
+    streak: ctx.streak,
+    safe: Math.round(ctx.safeToSpend),
+    percent: Math.round(ctx.spendingPercent),
+  };
+
+  if (ctx.justUploadedTx && ctx.spendingPercent < 75 && !ctx.hasBudgetAlert) {
+    return {
+      kind: "upload_celebration",
+      mood: "celebrating",
+      messageKey: "nudge.upload_celebration",
+      reminderKey: "nudge.reminder_saving",
+      params,
+    };
+  }
+
+  if (ctx.hasBudgetAlert || ctx.spendingPercent >= 80) {
+    return {
+      kind: "overspend_warning",
+      mood: "alert",
+      messageKey: "nudge.overspend",
+      reminderKey: "nudge.reminder_overspend",
+      tipKey: "nudge.tip_adjust",
+      params,
+    };
+  }
+
+  if (ctx.spendingPercent >= 65) {
+    return {
+      kind: "overspend_warning",
+      mood: "worried",
+      messageKey: "nudge.budget_slow_down",
+      reminderKey: "nudge.reminder_overspend",
+      tipKey: "nudge.tip_adjust",
+      params,
+    };
+  }
+
+  if (ctx.safeToSpend >= 0 && ctx.safeToSpend < 30) {
+    return {
+      kind: "careful_spending",
+      mood: "worried",
+      messageKey: "nudge.careful",
+      reminderKey: "nudge.reminder_overspend",
+      tipKey: "nudge.tip_adjust",
+      params,
+    };
+  }
+
+  if (ctx.todayExpenseTotal > 0 && ctx.todayExpenseTotal > Math.max(40, ctx.monthlyIncome / 25)) {
+    return {
+      kind: "careful_spending",
+      mood: "alert",
+      messageKey: "nudge.heavy_day",
+      reminderKey: "nudge.reminder_overspend",
+      params,
+    };
+  }
+
+  if (ctx.spendingPercent < 55) {
+    return {
+      kind: "save_reminder",
+      mood: "happy",
+      messageKey: "nudge.save_reminder",
+      reminderKey: "nudge.reminder_saving",
+      tipKey: "nudge.tip_adjust",
+      params,
+    };
+  }
+
+  return {
+    kind: "friendly_checkin",
+    mood: "happy",
+    messageKey: "nudge.checkin",
+    reminderKey: "nudge.reminder_saving",
+    tipKey: "nudge.tip_adjust",
+    params,
+  };
+}
+
 export function pickCoachNudge(ctx: CoachNudgeContext): CoachNudge {
   const name = ctx.userName || "there";
   const amount = Math.round(ctx.todayExpenseTotal);

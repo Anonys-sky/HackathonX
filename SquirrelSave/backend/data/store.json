@@ -1,12 +1,12 @@
 {
   "counters": {
     "user": 2,
-    "wallet": 3,
-    "transaction": 0,
+    "wallet": 6,
+    "transaction": 3,
     "goal": 0,
     "streak": 0,
-    "xp": 1,
-    "chat": 12
+    "xp": 5,
+    "chat": 16
   },
   "users": {
     "guest-demo-judge": {
@@ -18,63 +18,109 @@
       "role": "user",
       "createdAt": "2026-05-23T09:51:55.637227+00:00",
       "updatedAt": "2026-05-23T09:51:55.637227+00:00",
-      "lastSignedIn": "2026-05-23T11:42:28.471751+00:00"
+      "lastSignedIn": "2026-05-23T12:16:23.262676+00:00"
     }
   },
   "profiles": {
     "guest-demo-judge": {
-      "monthlyIncome": 1700.0,
+      "monthlyIncome": 1800.0,
       "currency": "RM",
       "onboardingComplete": true,
       "userId": "guest-demo-judge",
-      "updatedAt": "2026-05-23T11:33:17.080695+00:00",
+      "updatedAt": "2026-05-23T12:13:41.953167+00:00",
       "createdAt": "2026-05-23T10:58:46.758024+00:00",
-      "xpPoints": 100,
+      "xpPoints": 230,
       "level": 1,
       "currentStreak": 0,
       "longestStreak": 0,
-      "mascotMood": "sleeping"
+      "mascotMood": "happy"
     }
   },
   "wallets": {
-    "1": {
-      "id": 1,
+    "4": {
+      "id": 4,
       "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T10:58:46.825008+00:00",
-      "updatedAt": "2026-05-23T10:58:46.825008+00:00",
+      "createdAt": "2026-05-23T11:48:21.941892+00:00",
+      "updatedAt": "2026-05-23T11:48:21.941892+00:00",
       "walletType": "needs",
       "label": "Needs",
       "allocationPercent": 50.0,
-      "allocatedAmount": 850.0,
-      "currentBalance": 850.0,
+      "allocatedAmount": 900.0,
+      "currentBalance": 900.0,
       "color": "#FF6B6B"
+    },
+    "5": {
+      "id": 5,
+      "userId": "guest-demo-judge",
+      "createdAt": "2026-05-23T11:48:21.941892+00:00",
+      "updatedAt": "2026-05-23T12:10:15.013517+00:00",
+      "walletType": "wants",
+      "label": "Wants",
+      "allocationPercent": 30.0,
+      "allocatedAmount": 540.0,
+      "currentBalance": 462.70000000000005,
+      "color": "#A78BFA"
+    },
+    "6": {
+      "id": 6,
+      "userId": "guest-demo-judge",
+      "createdAt": "2026-05-23T11:48:21.941892+00:00",
+      "updatedAt": "2026-05-23T11:48:21.941892+00:00",
+      "walletType": "savings",
+      "label": "Savings",
+      "allocationPercent": 20.0,
+      "allocatedAmount": 360.0,
+      "currentBalance": 360.0,
+      "color": "#34D399"
+    }
+  },
+  "transactions": {
+    "1": {
+      "id": 1,
+      "userId": "guest-demo-judge",
+      "createdAt": "2026-05-23T12:10:14.701012+00:00",
+      "transactedAt": "2026-05-23T12:10:14.685257+00:00",
+      "merchantName": "Starbucks",
+      "category": "food_beverage",
+      "amount": 18.9,
+      "type": "expense",
+      "walletId": null,
+      "note": null,
+      "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
+      "confidenceScore": 0.72,
+      "needsVerification": false
     },
     "2": {
       "id": 2,
       "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T10:58:46.825008+00:00",
-      "updatedAt": "2026-05-23T10:58:46.825008+00:00",
-      "walletType": "wants",
-      "label": "Wants",
-      "allocationPercent": 30.0,
-      "allocatedAmount": 510.0,
-      "currentBalance": 510.0,
-      "color": "#A78BFA"
+      "createdAt": "2026-05-23T12:10:14.835538+00:00",
+      "transactedAt": "2026-05-23T12:10:14.816696+00:00",
+      "merchantName": "TOLL SMART",
+      "category": "transport",
+      "amount": 3.5,
+      "type": "expense",
+      "walletId": null,
+      "note": null,
+      "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
+      "confidenceScore": 0.72,
+      "needsVerification": false
     },
     "3": {
       "id": 3,
       "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T10:58:46.825008+00:00",
-      "updatedAt": "2026-05-23T10:58:46.825008+00:00",
-      "walletType": "savings",
-      "label": "Savings",
-      "allocationPercent": 20.0,
-      "allocatedAmount": 340.0,
-      "currentBalance": 340.0,
-      "color": "#34D399"
+      "createdAt": "2026-05-23T12:10:14.977540+00:00",
+      "transactedAt": "2026-05-23T12:10:14.959643+00:00",
+      "merchantName": "Netflix MYR",
+      "category": "entertainment",
+      "amount": 54.9,
+      "type": "expense",
+      "walletId": null,
+      "note": null,
+      "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
+      "confidenceScore": 0.72,
+      "needsVerification": false
     }
   },
-  "transactions": {},
   "goals": {},
   "streaks": {},
   "xp_events": {
@@ -85,6 +131,38 @@
       "xpAwarded": 100,
       "description": "Completed onboarding! Welcome to SquirryCoach \ud83d\udc3f\ufe0f",
       "createdAt": "2026-05-23T10:58:46.898628+00:00"
+    },
+    "2": {
+      "id": 2,
+      "userId": "guest-demo-judge",
+      "eventType": "onboarding_complete",
+      "xpAwarded": 100,
+      "description": "Completed onboarding! Welcome to SquirryCoach \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T11:48:22.018038+00:00"
+    },
+    "3": {
+      "id": 3,
+      "userId": "guest-demo-judge",
+      "eventType": "transaction_logged",
+      "xpAwarded": 10,
+      "description": "Logged transaction: Starbucks",
+      "createdAt": "2026-05-23T12:10:14.764442+00:00"
+    },
+    "4": {
+      "id": 4,
+      "userId": "guest-demo-judge",
+      "eventType": "transaction_logged",
+      "xpAwarded": 10,
+      "description": "Logged transaction: TOLL SMART",
+      "createdAt": "2026-05-23T12:10:14.912289+00:00"
+    },
+    "5": {
+      "id": 5,
+      "userId": "guest-demo-judge",
+      "eventType": "transaction_logged",
+      "xpAwarded": 10,
+      "description": "Logged transaction: Netflix MYR",
+      "createdAt": "2026-05-23T12:10:15.055120+00:00"
     }
   },
   "chat_messages": {
@@ -171,6 +249,34 @@
       "role": "assistant",
       "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
       "createdAt": "2026-05-23T11:34:06.653556+00:00"
+    },
+    "13": {
+      "id": 13,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Cheap day, help me save",
+      "createdAt": "2026-05-23T11:44:47.139168+00:00"
+    },
+    "14": {
+      "id": 14,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T11:44:47.164117+00:00"
+    },
+    "15": {
+      "id": 15,
+      "userId": "guest-demo-judge",
+      "role": "user",
+      "content": "Plan my budget for today",
+      "createdAt": "2026-05-23T11:45:06.658073+00:00"
+    },
+    "16": {
+      "id": 16,
+      "userId": "guest-demo-judge",
+      "role": "assistant",
+      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
+      "createdAt": "2026-05-23T11:45:06.674690+00:00"
     }
   }
 }

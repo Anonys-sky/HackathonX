@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Globe, Home, Activity, Users, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BRAND_NAME } from "@shared/brand";
+import { SquirryMascot } from "@/components/SquirryMascot";
 
 const NAV_ITEMS = [
   { href: "/dashboard", icon: Home, key: "nav.dashboard" },
@@ -26,7 +27,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <div className="sticky top-0 z-40 bg-white border-b border-border">
         <div className="flex items-center justify-between px-4 h-14">
           <button onClick={() => navigate("/")} className="flex items-center gap-2 font-display text-lg text-foreground">
-            <span>🐿️</span>
+            <SquirryMascot mood="happy" size={28} className="shrink-0" />
             <span>{BRAND_NAME}</span>
           </button>
           <DropdownMenu>
@@ -52,7 +53,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <main className="flex-1 overflow-y-auto pb-20">{children}</main>
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-border">
+      <nav className="fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-border pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16 max-w-md mx-auto w-full">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
