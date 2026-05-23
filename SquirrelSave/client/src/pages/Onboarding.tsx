@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -61,6 +61,9 @@ export default function Onboarding() {
   const [currency, setCurrency] = useState(DEFAULTS.currency);
   const [allocations, setAllocations] = useState(buildInitialAllocations);
 
+  // Ref to prevent the redirect useEffect from firing during handleFinish
+  const isSubmittingRef = useRef(false);
+
   const queryClient = useQueryClient();
   const profileQuery = trpc.profile.get.useQuery();
   const setupProfile = trpc.profile.setup.useMutation();
@@ -68,6 +71,9 @@ export default function Onboarding() {
   const completeOnboarding = trpc.profile.completeOnboarding.useMutation();
 
   useEffect(() => {
+    // Don't redirect if we're in the middle of submitting — handleFinish
+    // will navigate on its own after properly seeding the cache.
+    if (isSubmittingRef.current) return;
     if (profileQuery.isSuccess && profileQuery.data?.onboardingComplete) {
       navigate("/dashboard");
     }
@@ -105,6 +111,10 @@ export default function Onboarding() {
       toast.error(t("onboard.over_100"));
       return;
     }
+
+    // Block the useEffect redirect while we're finishing up
+    isSubmittingRef.current = true;
+
     try {
       await setupProfile.mutateAsync({ monthlyIncome: incomeNum, currency });
       await setupWallets.mutateAsync({
@@ -119,18 +129,40 @@ export default function Onboarding() {
           })),
       });
       await completeOnboarding.mutateAsync();
+
+      // Fetch fresh data from the server to seed the cache
       const [profile, stats] = await Promise.all([
         apiClient.profile.get(),
         apiClient.profile.getStats(),
       ]);
-      queryClient.setQueryData(["profile", "get"], profile);
-      queryClient.setQueryData(["profile", "stats"], stats);
+
       if (!stats?.profile?.onboardingComplete) {
         throw new Error("Onboarding could not be saved. Check that the API is running.");
       }
+
+      // Seed the react-query cache so Dashboard doesn't refetch stale data
+      queryClient.setQueryData(["profile", "get"], profile);
+      queryClient.setQueryData(["profile", "stats"], stats);
+
+      // Invalidate all related queries so Dashboard shows fresh data
+      // (without refetching — the setQueryData above is already fresh)
+      await queryClient.invalidateQueries({
+        queryKey: ["wallets"],
+        refetchType: "none",
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["transactions"],
+        refetchType: "none",
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["goals"],
+        refetchType: "none",
+      });
+
       toast.success(t("common.success"));
       navigate("/dashboard");
     } catch (err) {
+      isSubmittingRef.current = false;
       console.error("[Onboarding]", err);
       const message = err instanceof Error ? err.message : t("common.error");
       toast.error(message || t("common.error"));

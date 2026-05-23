@@ -131,6 +131,7 @@ export default function Dashboard() {
   const needsOnboarding =
     !statsQuery.isLoading &&
     !statsQuery.isFetching &&
+    !statsQuery.isPlaceholderData &&
     statsQuery.isSuccess &&
     (!profile || !profile.onboardingComplete);
 

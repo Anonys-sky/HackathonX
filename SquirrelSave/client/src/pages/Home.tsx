@@ -79,7 +79,7 @@ export default function Home() {
             variant="outline"
             size="sm"
             className="rounded-full"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => void continueWithoutLogin()}
           >
             {t("home.cta")}
           </Button>

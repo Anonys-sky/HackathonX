@@ -1,87 +1,86 @@
 {
   "counters": {
-    "user": 2,
-    "wallet": 6,
-    "transaction": 7,
+    "user": 1,
+    "wallet": 3,
+    "transaction": 3,
     "goal": 0,
-    "streak": 1,
-    "xp": 13,
-    "chat": 36,
-    "streak_pot": 1
+    "streak": 0,
+    "xp": 4,
+    "chat": 0,
+    "streak_pot": 0
   },
   "users": {
-    "guest-demo-judge": {
-      "id": 2,
-      "openId": "guest-demo-judge",
-      "name": "Guest Judge",
-      "email": "guest@localhost",
+    "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb": {
+      "id": 1,
+      "openId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "name": "Guest 5f5f9ddb",
+      "email": "5f5f9ddb@visitor.local",
       "loginMethod": "guest",
       "role": "user",
-      "createdAt": "2026-05-23T09:51:55.637227+00:00",
-      "updatedAt": "2026-05-23T09:51:55.637227+00:00",
-      "lastSignedIn": "2026-05-23T16:02:36.527674+00:00"
+      "createdAt": "2026-05-23T16:14:33.471669+00:00",
+      "updatedAt": "2026-05-23T16:14:33.471669+00:00",
+      "lastSignedIn": "2026-05-23T16:18:16.924962+00:00"
     }
   },
   "profiles": {
-    "guest-demo-judge": {
-      "monthlyIncome": 1800.0,
+    "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb": {
+      "monthlyIncome": 1700.0,
       "currency": "RM",
       "onboardingComplete": true,
-      "userId": "guest-demo-judge",
-      "updatedAt": "2026-05-23T15:53:35.702447+00:00",
-      "createdAt": "2026-05-23T10:58:46.758024+00:00",
-      "xpPoints": 355,
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "updatedAt": "2026-05-23T16:18:15.936312+00:00",
+      "createdAt": "2026-05-23T16:14:33.490914+00:00",
+      "xpPoints": 130,
       "level": 1,
-      "currentStreak": 1,
-      "longestStreak": 1,
-      "mascotMood": "happy",
-      "lastStreakDate": "2026-05-23T12:47:59.091306+00:00"
+      "currentStreak": 0,
+      "longestStreak": 0,
+      "mascotMood": "worried"
     }
   },
   "wallets": {
-    "4": {
-      "id": 4,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T11:48:21.941892+00:00",
-      "updatedAt": "2026-05-23T11:48:21.941892+00:00",
+    "1": {
+      "id": 1,
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "createdAt": "2026-05-23T16:14:33.540855+00:00",
+      "updatedAt": "2026-05-23T16:14:33.540855+00:00",
       "walletType": "needs",
       "label": "Needs",
       "allocationPercent": 50.0,
-      "allocatedAmount": 900.0,
-      "currentBalance": 900.0,
+      "allocatedAmount": 850.0,
+      "currentBalance": 850.0,
       "color": "#FF6B6B"
     },
-    "5": {
-      "id": 5,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T11:48:21.941892+00:00",
-      "updatedAt": "2026-05-23T12:27:22.330201+00:00",
+    "2": {
+      "id": 2,
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "createdAt": "2026-05-23T16:14:33.540855+00:00",
+      "updatedAt": "2026-05-23T16:17:59.937576+00:00",
       "walletType": "wants",
       "label": "Wants",
       "allocationPercent": 30.0,
-      "allocatedAmount": 540.0,
-      "currentBalance": 385.4000000000001,
+      "allocatedAmount": 510.0,
+      "currentBalance": 432.70000000000005,
       "color": "#A78BFA"
     },
-    "6": {
-      "id": 6,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T11:48:21.941892+00:00",
-      "updatedAt": "2026-05-23T12:28:07.778191+00:00",
+    "3": {
+      "id": 3,
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "createdAt": "2026-05-23T16:14:33.540855+00:00",
+      "updatedAt": "2026-05-23T16:14:33.540855+00:00",
       "walletType": "savings",
       "label": "Savings",
       "allocationPercent": 20.0,
-      "allocatedAmount": 360.0,
-      "currentBalance": 410.0,
+      "allocatedAmount": 340.0,
+      "currentBalance": 0,
       "color": "#34D399"
     }
   },
   "transactions": {
     "1": {
       "id": 1,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:10:14.701012+00:00",
-      "transactedAt": "2026-05-23T12:10:14.685257+00:00",
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "createdAt": "2026-05-23T16:17:59.668967+00:00",
+      "transactedAt": "2026-05-23T16:17:59.654768+00:00",
       "merchantName": "Starbucks",
       "category": "food_beverage",
       "amount": 18.9,
@@ -94,9 +93,9 @@
     },
     "2": {
       "id": 2,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:10:14.835538+00:00",
-      "transactedAt": "2026-05-23T12:10:14.816696+00:00",
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "createdAt": "2026-05-23T16:17:59.795035+00:00",
+      "transactedAt": "2026-05-23T16:17:59.780598+00:00",
       "merchantName": "TOLL SMART",
       "category": "transport",
       "amount": 3.5,
@@ -109,9 +108,9 @@
     },
     "3": {
       "id": 3,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:10:14.977540+00:00",
-      "transactedAt": "2026-05-23T12:10:14.959643+00:00",
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "createdAt": "2026-05-23T16:17:59.920939+00:00",
+      "transactedAt": "2026-05-23T16:17:59.890834+00:00",
       "merchantName": "Netflix MYR",
       "category": "entertainment",
       "amount": 54.9,
@@ -120,502 +119,45 @@
       "note": null,
       "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
       "confidenceScore": 0.72,
-      "needsVerification": false
-    },
-    "4": {
-      "id": 4,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:27:22.017293+00:00",
-      "transactedAt": "2026-05-23T12:27:21.999278+00:00",
-      "merchantName": "Starbucks",
-      "category": "food_beverage",
-      "amount": 18.9,
-      "type": "expense",
-      "walletId": null,
-      "note": null,
-      "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
-      "confidenceScore": 0.72,
-      "needsVerification": false
-    },
-    "5": {
-      "id": 5,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:27:22.156492+00:00",
-      "transactedAt": "2026-05-23T12:27:22.137507+00:00",
-      "merchantName": "TOLL SMART",
-      "category": "transport",
-      "amount": 3.5,
-      "type": "expense",
-      "walletId": null,
-      "note": null,
-      "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
-      "confidenceScore": 0.72,
-      "needsVerification": false
-    },
-    "6": {
-      "id": 6,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:27:22.285866+00:00",
-      "transactedAt": "2026-05-23T12:27:22.265928+00:00",
-      "merchantName": "Netflix MYR",
-      "category": "entertainment",
-      "amount": 54.9,
-      "type": "expense",
-      "walletId": null,
-      "note": null,
-      "rawText": "Starbucks RM 18.90\nTOLL SMART 3.50\nNetflix MYR 54.90",
-      "confidenceScore": 0.72,
-      "needsVerification": false
-    },
-    "7": {
-      "id": 7,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:28:07.753317+00:00",
-      "transactedAt": "2026-05-23T12:28:07.732424+00:00",
-      "merchantName": "Saving",
-      "category": "income",
-      "amount": 50.0,
-      "type": "income",
-      "walletId": null,
-      "note": null,
-      "rawText": null,
-      "confidenceScore": 0.92,
       "needsVerification": false
     }
   },
   "goals": {},
-  "streaks": {
-    "1": {
-      "id": 1,
-      "userId": "guest-demo-judge",
-      "createdAt": "2026-05-23T12:47:56.889101+00:00",
-      "updatedAt": "2026-05-23T12:47:59.070610+00:00",
-      "friendId": -9998866,
-      "friendName": "ddd",
-      "friendAvatar": "\ud83d\udc3f\ufe0f",
-      "currentStreak": 1,
-      "isActive": true
-    }
-  },
+  "streaks": {},
   "xp_events": {
     "1": {
       "id": 1,
-      "userId": "guest-demo-judge",
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
       "eventType": "onboarding_complete",
       "xpAwarded": 100,
       "description": "Completed onboarding! Welcome to SquirryCoach \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T10:58:46.898628+00:00"
+      "createdAt": "2026-05-23T16:14:33.599701+00:00"
     },
     "2": {
       "id": 2,
-      "userId": "guest-demo-judge",
-      "eventType": "onboarding_complete",
-      "xpAwarded": 100,
-      "description": "Completed onboarding! Welcome to SquirryCoach \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:48:22.018038+00:00"
-    },
-    "3": {
-      "id": 3,
-      "userId": "guest-demo-judge",
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
       "eventType": "transaction_logged",
       "xpAwarded": 10,
       "description": "Logged transaction: Starbucks",
-      "createdAt": "2026-05-23T12:10:14.764442+00:00"
-    },
-    "4": {
-      "id": 4,
-      "userId": "guest-demo-judge",
-      "eventType": "transaction_logged",
-      "xpAwarded": 10,
-      "description": "Logged transaction: TOLL SMART",
-      "createdAt": "2026-05-23T12:10:14.912289+00:00"
-    },
-    "5": {
-      "id": 5,
-      "userId": "guest-demo-judge",
-      "eventType": "transaction_logged",
-      "xpAwarded": 10,
-      "description": "Logged transaction: Netflix MYR",
-      "createdAt": "2026-05-23T12:10:15.055120+00:00"
-    },
-    "6": {
-      "id": 6,
-      "userId": "guest-demo-judge",
-      "eventType": "transaction_logged",
-      "xpAwarded": 10,
-      "description": "Logged transaction: Starbucks",
-      "createdAt": "2026-05-23T12:27:22.073155+00:00"
-    },
-    "7": {
-      "id": 7,
-      "userId": "guest-demo-judge",
-      "eventType": "transaction_logged",
-      "xpAwarded": 10,
-      "description": "Logged transaction: TOLL SMART",
-      "createdAt": "2026-05-23T12:27:22.213150+00:00"
-    },
-    "8": {
-      "id": 8,
-      "userId": "guest-demo-judge",
-      "eventType": "transaction_logged",
-      "xpAwarded": 10,
-      "description": "Logged transaction: Netflix MYR",
-      "createdAt": "2026-05-23T12:27:22.368404+00:00"
-    },
-    "9": {
-      "id": 9,
-      "userId": "guest-demo-judge",
-      "eventType": "transaction_logged",
-      "xpAwarded": 10,
-      "description": "Logged transaction: Saving",
-      "createdAt": "2026-05-23T12:28:07.815315+00:00"
-    },
-    "10": {
-      "id": 10,
-      "userId": "guest-demo-judge",
-      "eventType": "streak_extended",
-      "xpAwarded": 25,
-      "description": "Extended streak with ddd to 1 days!",
-      "createdAt": "2026-05-23T12:47:59.115537+00:00"
-    },
-    "11": {
-      "id": 11,
-      "userId": "guest-demo-judge",
-      "eventType": "logged_expense",
-      "xpAwarded": 10,
-      "description": "Daily action: logged expense",
-      "createdAt": "2026-05-23T13:26:45.207658+00:00"
-    },
-    "12": {
-      "id": 12,
-      "userId": "guest-demo-judge",
-      "eventType": "stayed_in_budget",
-      "xpAwarded": 20,
-      "description": "Daily action: stayed in budget",
-      "createdAt": "2026-05-23T13:26:47.488031+00:00"
-    },
-    "13": {
-      "id": 13,
-      "userId": "guest-demo-judge",
-      "eventType": "saved_to_goal",
-      "xpAwarded": 30,
-      "description": "Daily action: saved to goal",
-      "createdAt": "2026-05-23T13:26:48.685175+00:00"
-    }
-  },
-  "chat_messages": {
-    "1": {
-      "id": 1,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Food RM25, groceries RM100",
-      "createdAt": "2026-05-23T10:59:02.021647+00:00"
-    },
-    "2": {
-      "id": 2,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T10:59:02.971030+00:00"
+      "createdAt": "2026-05-23T16:17:59.715083+00:00"
     },
     "3": {
       "id": 3,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T11:10:51.994970+00:00"
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "eventType": "transaction_logged",
+      "xpAwarded": 10,
+      "description": "Logged transaction: TOLL SMART",
+      "createdAt": "2026-05-23T16:17:59.843897+00:00"
     },
     "4": {
       "id": 4,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:10:53.536629+00:00"
-    },
-    "5": {
-      "id": 5,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Cheap day, help me save",
-      "createdAt": "2026-05-23T11:11:25.792741+00:00"
-    },
-    "6": {
-      "id": 6,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:11:26.849225+00:00"
-    },
-    "7": {
-      "id": 7,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "hi",
-      "createdAt": "2026-05-23T11:11:44.041280+00:00"
-    },
-    "8": {
-      "id": 8,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:11:44.955915+00:00"
-    },
-    "9": {
-      "id": 9,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "hi",
-      "createdAt": "2026-05-23T11:11:51.228449+00:00"
-    },
-    "10": {
-      "id": 10,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:11:52.103759+00:00"
-    },
-    "11": {
-      "id": 11,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Cheap day, help me save",
-      "createdAt": "2026-05-23T11:34:05.306702+00:00"
-    },
-    "12": {
-      "id": 12,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Here's a starter plan for today \u2014 about RM57.0 total. Tweak any category! \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:34:06.653556+00:00"
-    },
-    "13": {
-      "id": 13,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Cheap day, help me save",
-      "createdAt": "2026-05-23T11:44:47.139168+00:00"
-    },
-    "14": {
-      "id": 14,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:44:47.164117+00:00"
-    },
-    "15": {
-      "id": 15,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T11:45:06.658073+00:00"
-    },
-    "16": {
-      "id": 16,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T11:45:06.674690+00:00"
-    },
-    "17": {
-      "id": 17,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T13:24:54.021920+00:00"
-    },
-    "18": {
-      "id": 18,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T13:24:54.049914+00:00"
-    },
-    "19": {
-      "id": 19,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T13:24:59.085559+00:00"
-    },
-    "20": {
-      "id": 20,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM60 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T13:24:59.105369+00:00"
-    },
-    "21": {
-      "id": 21,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T14:35:27.960495+00:00"
-    },
-    "22": {
-      "id": 22,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM43 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:35:27.987769+00:00"
-    },
-    "23": {
-      "id": 23,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Food RM25, groceries RM100",
-      "createdAt": "2026-05-23T14:52:06.977480+00:00"
-    },
-    "24": {
-      "id": 24,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM148 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:07.003646+00:00"
-    },
-    "25": {
-      "id": 25,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "reduce transport by rm11",
-      "createdAt": "2026-05-23T14:52:27.756685+00:00"
-    },
-    "26": {
-      "id": 26,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:27.777980+00:00"
-    },
-    "27": {
-      "id": 27,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Food RM25, groceries RM100",
-      "createdAt": "2026-05-23T14:52:40.542696+00:00"
-    },
-    "28": {
-      "id": 28,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:40.560778+00:00"
-    },
-    "29": {
-      "id": 29,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T14:52:41.756464+00:00"
-    },
-    "30": {
-      "id": 30,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:41.779995+00:00"
-    },
-    "31": {
-      "id": 31,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Cheap day, help me save",
-      "createdAt": "2026-05-23T14:52:43.441721+00:00"
-    },
-    "32": {
-      "id": 32,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM147 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:43.458008+00:00"
-    },
-    "33": {
-      "id": 33,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Food RM25, groceries RM100",
-      "createdAt": "2026-05-23T14:52:46.613053+00:00"
-    },
-    "34": {
-      "id": 34,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM149 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:46.634078+00:00"
-    },
-    "35": {
-      "id": 35,
-      "userId": "guest-demo-judge",
-      "role": "user",
-      "content": "Plan my budget for today",
-      "createdAt": "2026-05-23T14:52:48.231685+00:00"
-    },
-    "36": {
-      "id": 36,
-      "userId": "guest-demo-judge",
-      "role": "assistant",
-      "content": "Done! I filled about RM149 for the day \u2014 tweak any line you like \ud83d\udc3f\ufe0f",
-      "createdAt": "2026-05-23T14:52:48.250228+00:00"
+      "userId": "visitor-a0eb1969-77d9-4f68-aa33-76565f5f9ddb",
+      "eventType": "transaction_logged",
+      "xpAwarded": 10,
+      "description": "Logged transaction: Netflix MYR",
+      "createdAt": "2026-05-23T16:17:59.969648+00:00"
     }
   },
-  "streak_pots": {
-    "1": {
-      "id": 1,
-      "name": "Weekly pot \u00b7 2026-W21",
-      "weekKey": "2026-W21",
-      "stakeAmount": 10.0,
-      "currency": "RM",
-      "simulated": true,
-      "potTotal": 30.0,
-      "createdAt": "2026-05-23T14:18:50.738525+00:00",
-      "members": [
-        {
-          "uid": "npc-danial",
-          "displayName": "Danial",
-          "avatar": "\ud83e\uddd1",
-          "isNpc": true,
-          "staked": true,
-          "breachedToday": false,
-          "forfeited": 0.0,
-          "won": 20.0,
-          "todayCheckedAt": "2026-05-23",
-          "wonXp": 30
-        },
-        {
-          "uid": "npc-aiman",
-          "displayName": "Aiman",
-          "avatar": "\ud83d\udc68",
-          "isNpc": true,
-          "staked": true,
-          "breachedToday": false,
-          "forfeited": 0.0,
-          "won": 20.0,
-          "todayCheckedAt": "2026-05-23",
-          "wonXp": 30
-        },
-        {
-          "uid": "guest-demo-judge",
-          "displayName": "Guest Judge",
-          "avatar": "\ud83d\udc3f\ufe0f",
-          "isNpc": false,
-          "staked": true,
-          "breachedToday": true,
-          "forfeited": 40.0,
-          "won": 0.0,
-          "todayCheckedAt": "2026-05-23",
-          "forfeitedXp": 60
-        }
-      ],
-      "lastSettledAt": "2026-05-23T14:35:04.372855+00:00",
-      "settlement": {
-        "losers": [
-          "Guest Judge"
-        ],
-        "winners": [
-          "Danial",
-          "Aiman"
-        ],
-        "shareXpEach": 5
-      }
-    }
-  }
+  "chat_messages": {},
+  "streak_pots": {}
 }
