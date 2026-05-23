@@ -8,7 +8,7 @@ Built for **HackathonX** — mobile-first **PWA** with **Continue without login*
 
 ## The problem
 
-*Aligned with our pitch deck — a real problem most **young adults in Malaysia** face today.*
+Most **young adults in Malaysia** struggle with money not because they never earn enough, but because spending is scattered, invisible until it’s too late, and finance apps make them feel worse instead of better.
 
 ### The avoidance cycle
 
